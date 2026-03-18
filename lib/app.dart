@@ -13,10 +13,11 @@ class InkwellApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
+    final router = ref.watch(routerProvider);
 
     final themeMode = settings.valueOrNull?.themeMode ?? ThemeMode.system;
     final font = settings.valueOrNull?.font ?? InkwellFont.inter;
-    final locale = settings.valueOrNull?.locale ?? const Locale('en');
+    final locale = settings.valueOrNull?.locale ?? const Locale('de');
 
     return MaterialApp.router(
       title: 'Inkwell',
@@ -32,7 +33,7 @@ class InkwellApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      routerConfig: appRouter,
+      routerConfig: router,
     );
   }
 }

@@ -13,15 +13,15 @@ class AdaptiveShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     final width = MediaQuery.sizeOf(context).width;
     final isWide = width >= _breakpoint;
 
     final destinations = [
-      _Destination(icon: Icons.edit_note, label: l10n.navDaily),
-      _Destination(icon: Icons.calendar_month, label: l10n.navCalendar),
-      _Destination(icon: Icons.search, label: l10n.navSearch),
-      _Destination(icon: Icons.settings, label: l10n.navSettings),
+      _Destination(icon: Icons.edit_note, label: l10n?.navDaily ?? 'Heute'),
+      _Destination(icon: Icons.calendar_month, label: l10n?.navCalendar ?? 'Kalender'),
+      _Destination(icon: Icons.search, label: l10n?.navSearch ?? 'Suche'),
+      _Destination(icon: Icons.settings, label: l10n?.navSettings ?? 'Einstellungen'),
     ];
 
     if (isWide) {
