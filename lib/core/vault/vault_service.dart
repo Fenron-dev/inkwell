@@ -50,25 +50,32 @@ tags: []
   }
 
   /// Opens an existing vault from its path.
+  /// Returns null if the path doesn't exist or is not accessible.
   Future<VaultConfig?> openVault(String path) async {
-    final configFile = File('$path/.inkwell/settings.json');
-    if (await configFile.exists()) {
-      final json = jsonDecode(await configFile.readAsString());
-      return VaultConfig.fromJson(json as Map<String, dynamic>);
-    }
+    try {
+      final configFile = File('$path/.inkwell/settings.json');
+      if (await configFile.exists()) {
+        final json = jsonDecode(await configFile.readAsString());
+        return VaultConfig.fromJson(json as Map<String, dynamic>);
+      }
 
-    // If no config exists but the folder has .md files, adopt it as a vault
-    final dir = Directory(path);
-    if (await dir.exists()) {
-      final config = VaultConfig(
-        path: path,
-        name: p.basename(path),
-        createdAt: DateTime.now(),
-      );
-      await Directory(config.inkwellPath).create(recursive: true);
-      final configFile = File('${config.inkwellPath}/settings.json');
-      await configFile.writeAsString(jsonEncode(config.toJson()));
-      return config;
+      // Adopt an existing folder as a vault (e.g. an Obsidian vault)
+      final dir = Directory(path);
+      if (await dir.exists()) {
+        final config = VaultConfig(
+          path: path,
+          name: p.basename(path),
+          createdAt: DateTime.now(),
+        );
+        await Directory(config.inkwellPath).create(recursive: true);
+        final settingsFile = File('${config.inkwellPath}/settings.json');
+        await settingsFile.writeAsString(jsonEncode(config.toJson()));
+        return config;
+      }
+    } catch (_) {
+      // Path not accessible or not writable — return null so the caller
+      // can clear the saved path and show the setup screen.
+      return null;
     }
 
     return null;

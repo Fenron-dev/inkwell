@@ -41,30 +41,47 @@ class VaultNotifier extends AsyncNotifier<VaultConfig?> {
   @override
   Future<VaultConfig?> build() async {
     final lastPath = await _VaultStorage.loadLastVaultPath();
-    if (lastPath == null) return null;
+    if (lastPath == null || lastPath.isEmpty) return null;
 
     final service = ref.read(vaultServiceProvider);
-    return service.openVault(lastPath);
+    try {
+      return await service.openVault(lastPath);
+    } catch (_) {
+      // Saved path is no longer valid (e.g. permissions changed, path removed).
+      // Clear it so the setup screen is shown instead of crashing.
+      await _VaultStorage.saveLastVaultPath('');
+      return null;
+    }
   }
 
   Future<VaultConfig> createVault(String path, String name) async {
     state = const AsyncLoading();
-    final service = ref.read(vaultServiceProvider);
-    final config = await service.createVault(path, name);
-    await _VaultStorage.saveLastVaultPath(path);
-    state = AsyncData(config);
-    return config;
+    try {
+      final service = ref.read(vaultServiceProvider);
+      final config = await service.createVault(path, name);
+      await _VaultStorage.saveLastVaultPath(path);
+      state = AsyncData(config);
+      return config;
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
+    }
   }
 
   Future<VaultConfig?> openVault(String path) async {
     state = const AsyncLoading();
-    final service = ref.read(vaultServiceProvider);
-    final config = await service.openVault(path);
-    if (config != null) {
-      await _VaultStorage.saveLastVaultPath(path);
+    try {
+      final service = ref.read(vaultServiceProvider);
+      final config = await service.openVault(path);
+      if (config != null) {
+        await _VaultStorage.saveLastVaultPath(path);
+      }
+      state = AsyncData(config);
+      return config;
+    } catch (e, st) {
+      state = AsyncError(e, st);
+      rethrow;
     }
-    state = AsyncData(config);
-    return config;
   }
 
   void closeVault() {
