@@ -8,6 +8,7 @@ import 'package:inkwell/l10n/app_localizations.dart';
 import '../../core/search/search_provider.dart';
 import '../../core/settings/settings_provider.dart';
 import '../../core/vault/vault_provider.dart';
+import '../../models/frontmatter.dart';
 import '../../models/journal_entry.dart';
 import 'properties_panel.dart';
 
@@ -87,7 +88,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     ref.read(searchIndexProvider)?.indexEntry(updated.filePath, updated.date);
   }
 
-  void _onFrontmatterChanged(frontmatter) {
+  void _onFrontmatterChanged(Frontmatter frontmatter) {
     if (_entry == null) return;
     setState(() {
       _entry = _entry!.copyWith(frontmatter: frontmatter);
