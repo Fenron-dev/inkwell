@@ -1,0 +1,33 @@
+Inkwell — Projekt-Spezifikation
+
+App-Name: Inkwell
+Framework: Flutter (Dart)
+Plattformen: Windows, macOS, Linux, Android, iOS
+Ziel: Ein Journal-Tool das lokal & verschlüsselt speichert, Markdown mit YAML Frontmatter nutzt (Obsidian-kompatibel), Medien unterstützt, und durch schnelle Eingabe + gutes Design zum täglichen Schreiben animiert.
+
+
+Kernfunktionen:
+- Markdown-Editor - Live-Preview, Obsidian-Shortcuts
+- Daily Notes - Auto-Template, Tages-Navigation
+- Quick Capture - Globaler Hotkey, schwebendes Fenster
+- Speech-to-Text - Offline, live Transkription
+- Medien - Bilder, Video, Audio einbetten
+- Suche - Volltextsuche, Echtzeit
+
+Struktur & Auswertung:
+- Properties - Mood, Energie, Schlaf, Ort + Custom
+- Tags - Hierarchisch, filterbar
+- Zusammenfassungen - Wöchentlich / monatlich / jährlich
+- Heatmap-Kalender - Streak-Anzeige, Jahresübersicht
+
+Datenhaltung: 
+- Verschlüsselt - AES-256-GCM, Schlüssel nur im RAM
+- Obsidian-kompatibel - Plaintext .md + YAML Frontmatter
+- Sync-agnostisch - iCloud / Syncthing / Dropbox — frei wählbar
+- Lokal & offline - Keine Cloud, keine Telemetrie
+
+UX-Ziele:
+- Schnell - App öffnet <100ms, Auto-Save
+- Ablenkungsfrei - Typewriter Mode, Fokus-View
+- Schön - Light / Dark, wählbare Schriftart
+

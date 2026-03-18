@@ -1,0 +1,48 @@
+{
+  "@@locale": "de",
+  "appTitle": "Inkwell",
+  "welcomeTitle": "Willkommen bei Inkwell",
+  "welcomeSubtitle": "Dein privates Journal, gespeichert auf deinem Gerät.",
+
+  "navDaily": "Heute",
+  "navCalendar": "Kalender",
+  "navSearch": "Suche",
+  "navSettings": "Einstellungen",
+
+  "editorPlaceholder": "Fang an zu schreiben...",
+  "editorPreview": "Vorschau",
+  "editorEdit": "Bearbeiten",
+  "editorSplitView": "Geteilte Ansicht",
+
+  "searchHint": "Einträge durchsuchen...",
+  "searchNoResults": "Keine Einträge gefunden.",
+
+  "calendarToday": "Heute",
+  "calendarEntries": "{count, plural, =0{Keine Einträge} =1{1 Eintrag} other{{count} Einträge}}",
+
+  "settingsTitle": "Einstellungen",
+  "settingsVaultPath": "Vault-Pfad",
+  "settingsTheme": "Design",
+  "settingsThemeLight": "Hell",
+  "settingsThemeDark": "Dunkel",
+  "settingsThemeSystem": "System",
+  "settingsFont": "Schriftart",
+  "settingsLanguage": "Sprache",
+
+  "vaultCreate": "Neuen Vault erstellen",
+  "vaultOpen": "Bestehenden Ordner öffnen",
+  "vaultChooseLocation": "Wähle einen Speicherort für dein Journal",
+
+  "frontmatterMood": "Stimmung",
+  "frontmatterEnergy": "Energie",
+  "frontmatterSleep": "Schlaf",
+  "frontmatterTags": "Tags",
+  "frontmatterLocation": "Ort",
+
+  "exportZip": "Als ZIP exportieren",
+
+  "cancel": "Abbrechen",
+  "save": "Speichern",
+  "delete": "Löschen",
+  "ok": "OK"
+}
