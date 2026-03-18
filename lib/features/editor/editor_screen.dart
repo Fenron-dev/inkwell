@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inkwell/l10n/app_localizations.dart';
 
 import '../../core/search/search_provider.dart';
+import '../../core/settings/settings_provider.dart';
 import '../../core/vault/vault_provider.dart';
 import '../../models/journal_entry.dart';
 
@@ -153,6 +154,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   Widget _buildEditor(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final editorColor = ref
+        .watch(settingsProvider)
+        .valueOrNull
+        ?.editorTextColor
+        .toColor();
     return TextField(
       controller: _controller,
       focusNode: _focusNode,
@@ -168,6 +174,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             fontFamily: 'monospace',
             height: 1.6,
+            color: editorColor, // null = theme default
           ),
       onChanged: (_) => _onTextChanged(),
     );

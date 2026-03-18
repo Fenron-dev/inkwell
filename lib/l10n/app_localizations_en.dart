@@ -48,6 +48,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchNoResults => 'No entries found.';
 
   @override
+  String get searchIndexing => 'Indexing entries…';
+
+  @override
+  String get searchIndexReady => 'Index up to date';
+
+  @override
+  String searchIndexUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count entries indexed',
+      one: '1 entry indexed',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get calendarToday => 'Today';
 
   @override
@@ -82,6 +99,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsFont => 'Font';
+
+  @override
+  String get settingsEditorColor => 'Editor Text Color';
+
+  @override
+  String get settingsEditorColorAuto => 'Auto';
+
+  @override
+  String get settingsEditorColorOffWhite => 'Off-white';
+
+  @override
+  String get settingsEditorColorAmber => 'Amber';
+
+  @override
+  String get settingsEditorColorMint => 'Mint';
 
   @override
   String get settingsLanguage => 'Language';

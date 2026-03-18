@@ -176,6 +176,15 @@ abstract class AppLocalizations {
   /// **'No entries found.'**
   String get searchNoResults;
 
+  /// Status while the search index is being built
+  String get searchIndexing;
+
+  /// Status when the search index is current
+  String get searchIndexReady;
+
+  /// Status after incremental reindex
+  String searchIndexUpdated(int count);
+
   /// Label for today in calendar
   ///
   /// In en, this message translates to:
@@ -229,6 +238,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Font'**
   String get settingsFont;
+
+  /// Label for editor text color setting
+  ///
+  /// In en, this message translates to:
+  /// **'Editor Text Color'**
+  String get settingsEditorColor;
+
+  /// Auto (follows theme) editor color option
+  String get settingsEditorColorAuto;
+
+  /// Off-white editor color option
+  String get settingsEditorColorOffWhite;
+
+  /// Amber editor color option
+  String get settingsEditorColorAmber;
+
+  /// Mint green editor color option
+  String get settingsEditorColorMint;
 
   /// Label for language setting
   ///

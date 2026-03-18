@@ -12,22 +12,26 @@ class AppSettings {
   final ThemeMode themeMode;
   final InkwellFont font;
   final Locale locale;
+  final InkwellEditorColor editorTextColor;
 
   const AppSettings({
     this.themeMode = ThemeMode.system,
     this.font = InkwellFont.inter,
     this.locale = const Locale('en'),
+    this.editorTextColor = InkwellEditorColor.auto,
   });
 
   AppSettings copyWith({
     ThemeMode? themeMode,
     InkwellFont? font,
     Locale? locale,
+    InkwellEditorColor? editorTextColor,
   }) {
     return AppSettings(
       themeMode: themeMode ?? this.themeMode,
       font: font ?? this.font,
       locale: locale ?? this.locale,
+      editorTextColor: editorTextColor ?? this.editorTextColor,
     );
   }
 
@@ -35,6 +39,7 @@ class AppSettings {
         'themeMode': themeMode.index,
         'font': font.name,
         'locale': locale.languageCode,
+        'editorTextColor': editorTextColor.name,
       };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) {
@@ -45,6 +50,10 @@ class AppSettings {
         orElse: () => InkwellFont.inter,
       ),
       locale: Locale(json['locale'] as String? ?? 'en'),
+      editorTextColor: InkwellEditorColor.values.firstWhere(
+        (c) => c.name == json['editorTextColor'],
+        orElse: () => InkwellEditorColor.auto,
+      ),
     );
   }
 }
@@ -93,6 +102,13 @@ class SettingsNotifier extends AsyncNotifier<AppSettings> {
   Future<void> setLocale(Locale locale) async {
     final current = state.valueOrNull ?? const AppSettings();
     final updated = current.copyWith(locale: locale);
+    state = AsyncData(updated);
+    await _save(updated);
+  }
+
+  Future<void> setEditorTextColor(InkwellEditorColor color) async {
+    final current = state.valueOrNull ?? const AppSettings();
+    final updated = current.copyWith(editorTextColor: color);
     state = AsyncData(updated);
     await _save(updated);
   }

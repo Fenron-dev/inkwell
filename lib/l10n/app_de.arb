@@ -30,6 +30,11 @@
   "settingsThemeDark": "Dunkel",
   "settingsThemeSystem": "System",
   "settingsFont": "Schriftart",
+  "settingsEditorColor": "Editor-Schriftfarbe",
+  "settingsEditorColorAuto": "Automatisch",
+  "settingsEditorColorOffWhite": "Cremeweiß",
+  "settingsEditorColorAmber": "Bernstein",
+  "settingsEditorColorMint": "Mint",
   "settingsLanguage": "Sprache",
 
   "vaultCreate": "Neuen Vault erstellen",

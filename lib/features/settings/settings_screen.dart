@@ -40,7 +40,9 @@ class SettingsScreen extends ConsumerWidget {
                 ],
                 selected: {s.themeMode},
                 onSelectionChanged: (modes) {
-                  ref.read(settingsProvider.notifier).setThemeMode(modes.first);
+                  ref
+                      .read(settingsProvider.notifier)
+                      .setThemeMode(modes.first);
                 },
               ),
             ),
@@ -65,6 +67,9 @@ class SettingsScreen extends ConsumerWidget {
                     .toList(),
               ),
             ),
+            const Divider(),
+            // Editor text color
+            _EditorColorTile(current: s.editorTextColor),
             const Divider(),
             // Language
             ListTile(
@@ -94,6 +99,121 @@ class SettingsScreen extends ConsumerWidget {
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Editor color picker tile
+// ---------------------------------------------------------------------------
+
+class _EditorColorTile extends ConsumerWidget {
+  final InkwellEditorColor current;
+  const _EditorColorTile({required this.current});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+
+    final options = [
+      (InkwellEditorColor.auto, l10n.settingsEditorColorAuto),
+      (InkwellEditorColor.offWhite, l10n.settingsEditorColorOffWhite),
+      (InkwellEditorColor.amber, l10n.settingsEditorColorAmber),
+      (InkwellEditorColor.mint, l10n.settingsEditorColorMint),
+    ];
+
+    return ListTile(
+      leading: const Icon(Icons.color_lens_outlined),
+      title: Text(l10n.settingsEditorColor),
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 4,
+          children: options.map((opt) {
+            final (color, label) = opt;
+            final selected = color == current;
+            return _ColorChip(
+              color: color,
+              label: label,
+              selected: selected,
+              onTap: () => ref
+                  .read(settingsProvider.notifier)
+                  .setEditorTextColor(color),
+            );
+          }).toList(),
+        ),
+      ),
+      isThreeLine: true,
+    );
+  }
+}
+
+class _ColorChip extends StatelessWidget {
+  final InkwellEditorColor color;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ColorChip({
+    required this.color,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final resolvedColor = color.toColor();
+
+    // Swatch circle: show the actual color, or a split light/dark symbol for auto
+    final Widget swatch = resolvedColor != null
+        ? CircleAvatar(
+            radius: 10,
+            backgroundColor: resolvedColor,
+          )
+        : CircleAvatar(
+            radius: 10,
+            backgroundColor: Colors.white,
+            child: CircleAvatar(
+              radius: 7,
+              backgroundColor: Colors.black87,
+            ),
+          );
+
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: selected
+              ? scheme.primaryContainer
+              : scheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected ? scheme.primary : Colors.transparent,
+            width: 2,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            swatch,
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: selected
+                        ? scheme.onPrimaryContainer
+                        : scheme.onSurfaceVariant,
+                    fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

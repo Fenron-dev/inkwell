@@ -1,6 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Preset editor text colors the user can choose from.
+enum InkwellEditorColor {
+  /// Follow the active theme (white in dark mode, dark in light mode).
+  auto,
+
+  /// Off-white — comfortable on dark backgrounds.
+  offWhite,
+
+  /// Warm amber — vintage terminal feel.
+  amber,
+
+  /// Soft green — classic green-screen aesthetic.
+  mint;
+
+  /// Returns the actual [Color] to use, or null for [auto] (theme default).
+  Color? toColor() => switch (this) {
+        InkwellEditorColor.auto => null,
+        InkwellEditorColor.offWhite => const Color(0xFFEEEAD8),
+        InkwellEditorColor.amber => const Color(0xFFFFBF47),
+        InkwellEditorColor.mint => const Color(0xFF9CF0B4),
+      };
+}
+
 /// Available editor fonts the user can choose from.
 enum InkwellFont {
   inter('Inter'),
@@ -33,10 +56,16 @@ class AppTheme {
   }
 
   static ThemeData _buildTheme(ColorScheme colorScheme, InkwellFont font) {
+    // Pass the correct brightness base so Google Fonts only changes the
+    // typeface while the theme-appropriate text colors are preserved.
+    final baseTextTheme = colorScheme.brightness == Brightness.dark
+        ? ThemeData.dark().textTheme
+        : ThemeData.light().textTheme;
+
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      textTheme: _textThemeFor(font),
+      textTheme: _textThemeFor(font, baseTextTheme),
       appBarTheme: AppBarTheme(
         centerTitle: false,
         elevation: 0,
@@ -72,12 +101,12 @@ class AppTheme {
   /// Returns the correct TextTheme for a given font by calling the
   /// specific google_fonts method — avoids passing internal asset paths
   /// to getTextTheme() which would throw an exception.
-  static TextTheme _textThemeFor(InkwellFont font) => switch (font) {
-        InkwellFont.inter => GoogleFonts.interTextTheme(),
-        InkwellFont.merriweather => GoogleFonts.merriweatherTextTheme(),
-        InkwellFont.jetBrainsMono => GoogleFonts.jetBrainsMonoTextTheme(),
-        InkwellFont.lora => GoogleFonts.loraTextTheme(),
-        InkwellFont.openDyslexic =>
-          const TextTheme(), // OpenDyslexic is not a Google Font — use system font
+  static TextTheme _textThemeFor(InkwellFont font, TextTheme base) =>
+      switch (font) {
+        InkwellFont.inter => GoogleFonts.interTextTheme(base),
+        InkwellFont.merriweather => GoogleFonts.merriweatherTextTheme(base),
+        InkwellFont.jetBrainsMono => GoogleFonts.jetBrainsMonoTextTheme(base),
+        InkwellFont.lora => GoogleFonts.loraTextTheme(base),
+        InkwellFont.openDyslexic => base, // not a Google Font — keep base colors
       };
 }
