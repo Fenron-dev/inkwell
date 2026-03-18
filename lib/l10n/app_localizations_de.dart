@@ -153,6 +153,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get exportZip => 'Als ZIP exportieren';
 
   @override
+  String get exportRunning => 'ZIP-Archiv wird erstellt…';
+
+  @override
+  String exportDone(String path) => 'Gespeichert: $path';
+
+  @override
+  String get exportCancelled => 'Export abgebrochen.';
+
+  @override
+  String exportError(String error) => 'Export fehlgeschlagen: $error';
+
+  @override
   String get cancel => 'Abbrechen';
 
   @override

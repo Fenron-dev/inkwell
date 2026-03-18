@@ -50,6 +50,10 @@
   "frontmatterLocation": "Ort",
 
   "exportZip": "Als ZIP exportieren",
+  "exportRunning": "ZIP-Archiv wird erstellt…",
+  "exportDone": "Gespeichert: {path}",
+  "exportCancelled": "Export abgebrochen.",
+  "exportError": "Export fehlgeschlagen: {error}",
 
   "cancel": "Abbrechen",
   "save": "Speichern",

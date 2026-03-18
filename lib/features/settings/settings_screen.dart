@@ -2,17 +2,58 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inkwell/l10n/app_localizations.dart';
 
+import '../../core/export/export_service.dart';
 import '../../core/settings/settings_provider.dart';
+import '../../core/vault/vault_provider.dart';
 import '../../theme/app_theme.dart';
 
-/// Settings screen for theme, font, language, and vault configuration.
-class SettingsScreen extends ConsumerWidget {
+/// Settings screen for theme, font, language, vault configuration and export.
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  bool _exporting = false;
+
+  Future<void> _runExport(AppLocalizations l10n) async {
+    final vault = ref.read(vaultProvider).valueOrNull;
+    if (vault == null) return;
+
+    setState(() => _exporting = true);
+
+    try {
+      final result = await ExportService().export(vault);
+      if (!mounted) return;
+
+      if (result == null) {
+        _showSnackbar(l10n.exportCancelled);
+      } else {
+        _showSnackbar(l10n.exportDone(result.path), duration: 6);
+      }
+    } catch (e) {
+      if (mounted) _showSnackbar(l10n.exportError(e.toString()));
+    } finally {
+      if (mounted) setState(() => _exporting = false);
+    }
+  }
+
+  void _showSnackbar(String message, {int duration = 3}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: duration),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final settings = ref.watch(settingsProvider);
+    final vault = ref.watch(vaultProvider).valueOrNull;
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle)),
@@ -21,7 +62,7 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             // Theme
             ListTile(
-              leading: const Icon(Icons.palette),
+              leading: const Icon(Icons.palette_outlined),
               title: Text(l10n.settingsTheme),
               trailing: SegmentedButton<ThemeMode>(
                 segments: [
@@ -39,14 +80,13 @@ class SettingsScreen extends ConsumerWidget {
                   ),
                 ],
                 selected: {s.themeMode},
-                onSelectionChanged: (modes) {
-                  ref
-                      .read(settingsProvider.notifier)
-                      .setThemeMode(modes.first);
-                },
+                onSelectionChanged: (modes) => ref
+                    .read(settingsProvider.notifier)
+                    .setThemeMode(modes.first),
               ),
             ),
             const Divider(),
+
             // Font
             ListTile(
               leading: const Icon(Icons.text_fields),
@@ -68,9 +108,11 @@ class SettingsScreen extends ConsumerWidget {
               ),
             ),
             const Divider(),
+
             // Editor text color
             _EditorColorTile(current: s.editorTextColor),
             const Divider(),
+
             // Language
             ListTile(
               leading: const Icon(Icons.language),
@@ -95,6 +137,26 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ),
+            const Divider(),
+
+            // Export
+            if (vault != null)
+              ListTile(
+                leading: _exporting
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.archive_outlined),
+                title: Text(_exporting
+                    ? l10n.exportRunning
+                    : l10n.exportZip),
+                trailing: _exporting
+                    ? null
+                    : const Icon(Icons.chevron_right),
+                onTap: _exporting ? null : () => _runExport(l10n),
+              ),
           ],
         ),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -168,19 +230,12 @@ class _ColorChip extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final resolvedColor = color.toColor();
 
-    // Swatch circle: show the actual color, or a split light/dark symbol for auto
     final Widget swatch = resolvedColor != null
-        ? CircleAvatar(
-            radius: 10,
-            backgroundColor: resolvedColor,
-          )
+        ? CircleAvatar(radius: 10, backgroundColor: resolvedColor)
         : CircleAvatar(
             radius: 10,
             backgroundColor: Colors.white,
-            child: CircleAvatar(
-              radius: 7,
-              backgroundColor: Colors.black87,
-            ),
+            child: CircleAvatar(radius: 7, backgroundColor: Colors.black87),
           );
 
     return GestureDetector(
@@ -209,7 +264,8 @@ class _ColorChip extends StatelessWidget {
                     color: selected
                         ? scheme.onPrimaryContainer
                         : scheme.onSurfaceVariant,
-                    fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight:
+                        selected ? FontWeight.bold : FontWeight.normal,
                   ),
             ),
           ],

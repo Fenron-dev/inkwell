@@ -99,6 +99,20 @@
 
   "exportZip": "Export as ZIP",
   "@exportZip": { "description": "Button to export vault as ZIP" },
+  "exportRunning": "Creating ZIP archive…",
+  "@exportRunning": { "description": "Shown while the ZIP is being created" },
+  "exportDone": "Saved: {path}",
+  "@exportDone": {
+    "description": "Snackbar shown after a successful export",
+    "placeholders": { "path": { "type": "String" } }
+  },
+  "exportCancelled": "Export cancelled.",
+  "@exportCancelled": { "description": "Shown when user cancels the save dialog" },
+  "exportError": "Export failed: {error}",
+  "@exportError": {
+    "description": "Shown when the export throws an error",
+    "placeholders": { "error": { "type": "String" } }
+  },
 
   "cancel": "Cancel",
   "@cancel": { "description": "Generic cancel button" },

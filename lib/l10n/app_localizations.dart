@@ -183,12 +183,21 @@ abstract class AppLocalizations {
   String get searchNoResults;
 
   /// Status while the search index is being built
+  ///
+  /// In en, this message translates to:
+  /// **'Indexing entries…'**
   String get searchIndexing;
 
   /// Status when the search index is current
+  ///
+  /// In en, this message translates to:
+  /// **'Index up to date'**
   String get searchIndexReady;
 
   /// Status after incremental reindex
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 entry indexed} other{{count} entries indexed}}'**
   String searchIndexUpdated(int count);
 
   /// Label for today in calendar
@@ -252,15 +261,27 @@ abstract class AppLocalizations {
   String get settingsEditorColor;
 
   /// Auto (follows theme) editor color option
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
   String get settingsEditorColorAuto;
 
   /// Off-white editor color option
+  ///
+  /// In en, this message translates to:
+  /// **'Off-white'**
   String get settingsEditorColorOffWhite;
 
   /// Amber editor color option
+  ///
+  /// In en, this message translates to:
+  /// **'Amber'**
   String get settingsEditorColorAmber;
 
   /// Mint green editor color option
+  ///
+  /// In en, this message translates to:
+  /// **'Mint'**
   String get settingsEditorColorMint;
 
   /// Label for language setting
@@ -328,6 +349,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Export as ZIP'**
   String get exportZip;
+
+  /// Shown while the ZIP is being created
+  String get exportRunning;
+
+  /// Snackbar shown after a successful export
+  String exportDone(String path);
+
+  /// Shown when user cancels the save dialog
+  String get exportCancelled;
+
+  /// Shown when the export throws an error
+  String exportError(String error);
 
   /// Generic cancel button
   ///
