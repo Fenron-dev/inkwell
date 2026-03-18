@@ -45,7 +45,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/daily',
-              builder: (context, state) => const DailyNotesScreen(),
+              builder: (context, state) {
+                final dateStr = state.uri.queryParameters['date'];
+                final date =
+                    dateStr != null ? DateTime.tryParse(dateStr) : null;
+                return DailyNotesScreen(initialDate: date);
+              },
             ),
           ]),
           StatefulShellBranch(routes: [

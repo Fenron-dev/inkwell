@@ -5,6 +5,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inkwell/l10n/app_localizations.dart';
 
+import '../../core/search/search_provider.dart';
 import '../../core/vault/vault_provider.dart';
 import '../../models/journal_entry.dart';
 
@@ -78,6 +79,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
     final service = ref.read(vaultServiceProvider);
     await service.writeEntry(vault, updated);
+
+    // Keep search index in sync (fire-and-forget — non-blocking).
+    ref.read(searchIndexProvider)?.indexEntry(updated.filePath, updated.date);
   }
 
   @override

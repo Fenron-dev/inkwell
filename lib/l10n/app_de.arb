@@ -16,6 +16,9 @@
 
   "searchHint": "Einträge durchsuchen...",
   "searchNoResults": "Keine Einträge gefunden.",
+  "searchIndexing": "Einträge werden indiziert…",
+  "searchIndexReady": "Index aktuell",
+  "searchIndexUpdated": "{count, plural, =1{1 Eintrag indiziert} other{{count} Einträge indiziert}}",
 
   "calendarToday": "Heute",
   "calendarEntries": "{count, plural, =0{Keine Einträge} =1{1 Eintrag} other{{count} Einträge}}",

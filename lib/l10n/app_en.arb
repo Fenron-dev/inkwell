@@ -30,6 +30,15 @@
   "@searchHint": { "description": "Search field hint text" },
   "searchNoResults": "No entries found.",
   "@searchNoResults": { "description": "Shown when search returns no results" },
+  "searchIndexing": "Indexing entries…",
+  "@searchIndexing": { "description": "Status while the search index is being built" },
+  "searchIndexReady": "Index up to date",
+  "@searchIndexReady": { "description": "Status when the search index is current" },
+  "searchIndexUpdated": "{count, plural, =1{1 entry indexed} other{{count} entries indexed}}",
+  "@searchIndexUpdated": {
+    "description": "Status after incremental reindex",
+    "placeholders": { "count": { "type": "int" } }
+  },
 
   "calendarToday": "Today",
   "@calendarToday": { "description": "Label for today in calendar" },

@@ -8,14 +8,33 @@ import '../editor/editor_screen.dart';
 
 /// Daily notes view with day navigation and editor.
 class DailyNotesScreen extends ConsumerStatefulWidget {
-  const DailyNotesScreen({super.key});
+  /// When set (e.g. navigated from search results), the screen opens on this
+  /// date instead of today.
+  final DateTime? initialDate;
+
+  const DailyNotesScreen({super.key, this.initialDate});
 
   @override
   ConsumerState<DailyNotesScreen> createState() => _DailyNotesScreenState();
 }
 
 class _DailyNotesScreenState extends ConsumerState<DailyNotesScreen> {
-  DateTime _selectedDate = DateTime.now();
+  late DateTime _selectedDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDate = widget.initialDate ?? DateTime.now();
+  }
+
+  @override
+  void didUpdateWidget(DailyNotesScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialDate != null &&
+        widget.initialDate != oldWidget.initialDate) {
+      setState(() => _selectedDate = widget.initialDate!);
+    }
+  }
 
   void _goToDay(int offset) {
     setState(() {
