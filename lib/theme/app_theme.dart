@@ -11,14 +11,6 @@ enum InkwellFont {
 
   final String displayName;
   const InkwellFont(this.displayName);
-
-  TextStyle get textStyle => switch (this) {
-        InkwellFont.inter => GoogleFonts.inter(),
-        InkwellFont.merriweather => GoogleFonts.merriweather(),
-        InkwellFont.jetBrainsMono => GoogleFonts.jetBrainsMono(),
-        InkwellFont.lora => GoogleFonts.lora(),
-        InkwellFont.openDyslexic => GoogleFonts.openSans(), // Placeholder — bundle OpenDyslexic as asset later
-      };
 }
 
 class AppTheme {
@@ -41,14 +33,10 @@ class AppTheme {
   }
 
   static ThemeData _buildTheme(ColorScheme colorScheme, InkwellFont font) {
-    final baseTextTheme = font.textStyle.fontFamily != null
-        ? GoogleFonts.getTextTheme(font.textStyle.fontFamily!)
-        : const TextTheme();
-
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      textTheme: baseTextTheme,
+      textTheme: _textThemeFor(font),
       appBarTheme: AppBarTheme(
         centerTitle: false,
         elevation: 0,
@@ -80,4 +68,16 @@ class AppTheme {
       ),
     );
   }
+
+  /// Returns the correct TextTheme for a given font by calling the
+  /// specific google_fonts method — avoids passing internal asset paths
+  /// to getTextTheme() which would throw an exception.
+  static TextTheme _textThemeFor(InkwellFont font) => switch (font) {
+        InkwellFont.inter => GoogleFonts.interTextTheme(),
+        InkwellFont.merriweather => GoogleFonts.merriweatherTextTheme(),
+        InkwellFont.jetBrainsMono => GoogleFonts.jetBrainsMonoTextTheme(),
+        InkwellFont.lora => GoogleFonts.loraTextTheme(),
+        InkwellFont.openDyslexic =>
+          const TextTheme(), // OpenDyslexic is not a Google Font — use system font
+      };
 }
