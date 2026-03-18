@@ -43,6 +43,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get editorSplitView => 'Geteilte Ansicht';
 
   @override
+  String get propertiesToggle => 'Eigenschaften';
+
+  @override
   String get searchHint => 'Einträge durchsuchen...';
 
   @override
@@ -139,6 +142,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get frontmatterTags => 'Tags';
+
+  @override
+  String get tagAddHint => 'Tag hinzufügen…';
 
   @override
   String get frontmatterLocation => 'Ort';

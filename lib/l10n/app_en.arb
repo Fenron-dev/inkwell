@@ -25,6 +25,8 @@
   "@editorEdit": { "description": "Label for edit mode toggle" },
   "editorSplitView": "Split View",
   "@editorSplitView": { "description": "Label for split view mode" },
+  "propertiesToggle": "Properties",
+  "@propertiesToggle": { "description": "Tooltip for the properties panel toggle button" },
 
   "searchHint": "Search entries...",
   "@searchHint": { "description": "Search field hint text" },
@@ -90,6 +92,8 @@
   "@frontmatterSleep": { "description": "Label for sleep property" },
   "frontmatterTags": "Tags",
   "@frontmatterTags": { "description": "Label for tags property" },
+  "tagAddHint": "Add tag…",
+  "@tagAddHint": { "description": "Hint text for the tag input field" },
   "frontmatterLocation": "Location",
   "@frontmatterLocation": { "description": "Label for location property" },
 

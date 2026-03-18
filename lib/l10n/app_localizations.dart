@@ -164,6 +164,12 @@ abstract class AppLocalizations {
   /// **'Split View'**
   String get editorSplitView;
 
+  /// Tooltip for the properties panel toggle button
+  ///
+  /// In en, this message translates to:
+  /// **'Properties'**
+  String get propertiesToggle;
+
   /// Search field hint text
   ///
   /// In en, this message translates to:
@@ -304,6 +310,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tags'**
   String get frontmatterTags;
+
+  /// Hint text for the tag input field
+  ///
+  /// In en, this message translates to:
+  /// **'Add tag…'**
+  String get tagAddHint;
 
   /// Label for location property
   ///

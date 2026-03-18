@@ -13,6 +13,7 @@
   "editorPreview": "Vorschau",
   "editorEdit": "Bearbeiten",
   "editorSplitView": "Geteilte Ansicht",
+  "propertiesToggle": "Eigenschaften",
 
   "searchHint": "Einträge durchsuchen...",
   "searchNoResults": "Keine Einträge gefunden.",
@@ -45,6 +46,7 @@
   "frontmatterEnergy": "Energie",
   "frontmatterSleep": "Schlaf",
   "frontmatterTags": "Tags",
+  "tagAddHint": "Tag hinzufügen…",
   "frontmatterLocation": "Ort",
 
   "exportZip": "Als ZIP exportieren",

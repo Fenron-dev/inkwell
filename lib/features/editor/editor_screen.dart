@@ -9,6 +9,7 @@ import '../../core/search/search_provider.dart';
 import '../../core/settings/settings_provider.dart';
 import '../../core/vault/vault_provider.dart';
 import '../../models/journal_entry.dart';
+import 'properties_panel.dart';
 
 /// The main markdown editor with auto-save and switchable preview modes.
 class EditorScreen extends ConsumerStatefulWidget {
@@ -29,6 +30,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   JournalEntry? _entry;
   bool _loading = true;
   EditorMode _mode = EditorMode.edit;
+  bool _showProperties = false;
 
   @override
   void initState() {
@@ -85,6 +87,15 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     ref.read(searchIndexProvider)?.indexEntry(updated.filePath, updated.date);
   }
 
+  void _onFrontmatterChanged(frontmatter) {
+    if (_entry == null) return;
+    setState(() {
+      _entry = _entry!.copyWith(frontmatter: frontmatter);
+    });
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(milliseconds: 500), _saveNow);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -128,8 +139,35 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                   onPressed: () => setState(() => _mode = EditorMode.split),
                 ),
               ],
+              const Spacer(),
+              // Properties toggle
+              IconButton(
+                icon: Icon(
+                  _showProperties
+                      ? Icons.tune
+                      : Icons.tune_outlined,
+                  size: 20,
+                ),
+                color: _showProperties
+                    ? Theme.of(context).colorScheme.primary
+                    : null,
+                tooltip: l10n.propertiesToggle,
+                onPressed: () =>
+                    setState(() => _showProperties = !_showProperties),
+              ),
             ],
           ),
+        ),
+        // Collapsible properties panel
+        AnimatedSize(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          child: _showProperties && _entry != null
+              ? PropertiesPanel(
+                  frontmatter: _entry!.frontmatter,
+                  onChanged: _onFrontmatterChanged,
+                )
+              : const SizedBox.shrink(),
         ),
         const Divider(height: 1),
         // Editor / Preview area
