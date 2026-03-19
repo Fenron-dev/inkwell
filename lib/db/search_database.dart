@@ -125,10 +125,22 @@ class SearchDatabase extends GeneratedDatabase {
   // Read operations
   // ---------------------------------------------------------------------------
 
-  /// Full-text search. Returns up to [limit] results ordered by relevance.
-  Future<List<SearchResult>> search(String query, {int limit = 50}) async {
+  /// Full-text search with optional tag filter.
+  ///
+  /// When [tagFilter] is non-empty only entries that carry ALL of those tags
+  /// (AND semantics) are returned.
+  Future<List<SearchResult>> search(
+    String query, {
+    List<String> tagFilter = const [],
+    int limit = 50,
+  }) async {
     final ftsQuery = _buildFtsQuery(query);
     if (ftsQuery.isEmpty) return const [];
+
+    final tagClause = tagFilter.isEmpty
+        ? ''
+        : 'AND (SELECT COUNT(*) FROM json_each(ie.tags) jt '
+            'WHERE jt.value IN (${List.filled(tagFilter.length, '?').join(',')})) = ${tagFilter.length}';
 
     final rows = await customSelect(
       '''
@@ -139,25 +151,70 @@ class SearchDatabase extends GeneratedDatabase {
       FROM entry_fts
       JOIN indexed_entries ie ON ie.rowid = entry_fts.rowid
       WHERE entry_fts MATCH ?
+      $tagClause
       ORDER BY rank
       LIMIT ?
       ''',
       variables: [
         Variable.withString(ftsQuery),
+        ...tagFilter.map(Variable.withString),
         Variable.withInt(limit),
       ],
       readsFrom: const {},
     ).get();
 
-    return rows
-        .map((row) => SearchResult(
-              filePath: row.read<String>('file_path'),
-              date: DateTime.parse(row.read<String>('date')),
-              title: row.read<String>('title'),
-              snippet: row.read<String>('snippet'),
-            ))
-        .toList();
+    return _mapResults(rows);
   }
+
+  /// Returns all entries that carry ALL of [tags], sorted by date descending.
+  ///
+  /// Used for browsing by tag when no text query is entered.
+  Future<List<SearchResult>> filterByTags(
+    List<String> tags, {
+    int limit = 200,
+  }) async {
+    if (tags.isEmpty) return const [];
+
+    final rows = await customSelect(
+      '''
+      SELECT file_path, date, title, '' AS snippet
+      FROM indexed_entries
+      WHERE (SELECT COUNT(*) FROM json_each(tags) jt
+             WHERE jt.value IN (${List.filled(tags.length, '?').join(',')})) = ${tags.length}
+      ORDER BY date DESC
+      LIMIT ?
+      ''',
+      variables: [
+        ...tags.map(Variable.withString),
+        Variable.withInt(limit),
+      ],
+      readsFrom: const {},
+    ).get();
+
+    return _mapResults(rows);
+  }
+
+  /// Returns a sorted list of all distinct tag values in the index.
+  Future<List<String>> getAllTags() async {
+    final rows = await customSelect(
+      '''
+      SELECT DISTINCT jt.value AS tag
+      FROM indexed_entries, json_each(tags) jt
+      WHERE jt.value != ''
+      ORDER BY jt.value
+      ''',
+    ).get();
+    return rows.map((r) => r.read<String>('tag')).toList();
+  }
+
+  static List<SearchResult> _mapResults(List<QueryRow> rows) => rows
+      .map((row) => SearchResult(
+            filePath: row.read<String>('file_path'),
+            date: DateTime.parse(row.read<String>('date')),
+            title: row.read<String>('title'),
+            snippet: row.read<String>('snippet'),
+          ))
+      .toList();
 
   /// Returns a map of `filePath → lastIndexedMtime` for all indexed entries.
   Future<Map<String, int>> getAllIndexedMtimes() async {

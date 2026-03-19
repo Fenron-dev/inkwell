@@ -9,6 +9,48 @@ import 'package:inkwell/l10n/app_localizations.dart';
 import '../../core/search/search_provider.dart';
 import '../../db/search_database.dart';
 
+// ---------------------------------------------------------------------------
+// Tag filter row
+// ---------------------------------------------------------------------------
+
+class _TagFilterRow extends ConsumerWidget {
+  final List<String> selectedTags;
+  final void Function(String tag) onToggle;
+
+  const _TagFilterRow({required this.selectedTags, required this.onToggle});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final allTags = ref.watch(allTagsProvider);
+    return allTags.when(
+      data: (tags) {
+        if (tags.isEmpty) return const SizedBox.shrink();
+        return SizedBox(
+          height: 40,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            itemCount: tags.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 6),
+            itemBuilder: (context, i) {
+              final tag = tags[i];
+              final selected = selectedTags.contains(tag);
+              return FilterChip(
+                label: Text(tag),
+                selected: selected,
+                onSelected: (_) => onToggle(tag),
+                visualDensity: VisualDensity.compact,
+              );
+            },
+          ),
+        );
+      },
+      loading: () => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
+    );
+  }
+}
+
 /// Full-text search screen backed by the FTS5 index.
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -85,6 +127,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 _onQueryChanged(v);
               },
             ),
+          ),
+
+          // Tag filter chips
+          _TagFilterRow(
+            selectedTags: searchState.valueOrNull?.selectedTags ?? const [],
+            onToggle: (tag) =>
+                ref.read(searchProvider.notifier).toggleTag(tag),
           ),
 
           // Index status chip

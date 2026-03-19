@@ -85,7 +85,16 @@ class SearchIndex {
   // Search
   // ---------------------------------------------------------------------------
 
-  Future<List<SearchResult>> search(String query) => _db.search(query);
+  Future<List<SearchResult>> search(
+    String query, {
+    List<String> tagFilter = const [],
+  }) =>
+      _db.search(query, tagFilter: tagFilter);
+
+  Future<List<SearchResult>> filterByTags(List<String> tags) =>
+      _db.filterByTags(tags);
+
+  Future<List<String>> getAllTags() => _db.getAllTags();
 
   Future<int> countEntries() => _db.countEntries();
 
