@@ -196,4 +196,13 @@ tags: []
     }
     return _defaultTemplate;
   }
+
+  /// Writes the daily template content.
+  Future<void> writeTemplate(VaultConfig vault, String content) async {
+    final dir = Directory(vault.templatesPath);
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
+    await File('${vault.templatesPath}/daily.md').writeAsString(content);
+  }
 }

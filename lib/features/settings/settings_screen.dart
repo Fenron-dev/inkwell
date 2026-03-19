@@ -11,6 +11,7 @@ import '../../core/vault/vault_path_helper.dart';
 import '../../core/vault/vault_provider.dart';
 import '../../theme/app_theme.dart';
 import '../lock/pin_setup_screen.dart';
+import 'template_editor_screen.dart';
 
 /// Settings screen for theme, font, language, vault configuration and export.
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -194,6 +195,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             // App Lock
             _AppLockSection(),
+            const Divider(),
+
+            // Template editor
+            ListTile(
+              leading: const Icon(Icons.description_outlined),
+              title: Text(l10n.templateEditorTitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (_) => const TemplateEditorScreen()),
+              ),
+            ),
             const Divider(),
 
             // Export

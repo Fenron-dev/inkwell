@@ -469,6 +469,15 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OK'**
   String get ok;
+
+  /// AppBar title for the template editor screen
+  String get templateEditorTitle;
+
+  /// Hint text in the template editor
+  String get templateEditorHint;
+
+  /// Snackbar after the template is saved
+  String get templateSaved;
 }
 
 class _AppLocalizationsDelegate

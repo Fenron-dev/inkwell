@@ -251,4 +251,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ok => 'OK';
+
+  @override
+  String get templateEditorTitle => 'Edit Template';
+
+  @override
+  String get templateEditorHint => 'Write your daily template here…';
+
+  @override
+  String get templateSaved => 'Template saved';
 }
