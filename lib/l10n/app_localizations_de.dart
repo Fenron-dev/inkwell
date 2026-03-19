@@ -156,13 +156,71 @@ class AppLocalizationsDe extends AppLocalizations {
   String get exportRunning => 'ZIP-Archiv wird erstellt…';
 
   @override
-  String exportDone(String path) => 'Gespeichert: $path';
+  String exportDone(String path) {
+    return 'Gespeichert: $path';
+  }
 
   @override
   String get exportCancelled => 'Export abgebrochen.';
 
   @override
-  String exportError(String error) => 'Export fehlgeschlagen: $error';
+  String exportError(String error) {
+    return 'Export fehlgeschlagen: $error';
+  }
+
+  @override
+  String get lockEnterPIN => 'PIN eingeben';
+
+  @override
+  String get lockBiometricReason => 'Inkwell entsperren';
+
+  @override
+  String get lockWrongPIN => 'Falscher PIN';
+
+  @override
+  String get lockSetupTitle => 'PIN einrichten';
+
+  @override
+  String get lockSetupEnterNew => 'Neuen PIN eingeben';
+
+  @override
+  String get lockSetupConfirm => 'PIN bestätigen';
+
+  @override
+  String get lockSetupNoMatch => 'PINs stimmen nicht überein';
+
+  @override
+  String get lockSetupDone => 'PIN gespeichert';
+
+  @override
+  String get lockChangePIN => 'PIN ändern';
+
+  @override
+  String get lockRemovePIN => 'PIN entfernen';
+
+  @override
+  String get lockRemoveCurrentHint => 'Aktuellen PIN eingeben zum Entfernen';
+
+  @override
+  String get lockRemoveDone => 'PIN entfernt';
+
+  @override
+  String get lockRemoveWrong => 'Falscher PIN — konnte nicht entfernen';
+
+  @override
+  String get settingsLock => 'App-Sperre';
+
+  @override
+  String get settingsLockEnable => 'PIN-Sperre aktivieren';
+
+  @override
+  String get settingsLockActive => 'PIN aktiv';
+
+  @override
+  String get settingsLockBiometrics => 'Biometrie nutzen';
+
+  @override
+  String get settingsLockBiometricsHint => 'Fingerabdruck / Face ID';
 
   @override
   String get cancel => 'Abbrechen';

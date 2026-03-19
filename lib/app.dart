@@ -4,14 +4,37 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inkwell/l10n/app_localizations.dart';
 
 import 'app_router.dart';
+import 'core/security/lock_provider.dart';
 import 'core/settings/settings_provider.dart';
 import 'theme/app_theme.dart';
 
-class InkwellApp extends ConsumerWidget {
+class InkwellApp extends ConsumerStatefulWidget {
   const InkwellApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<InkwellApp> createState() => _InkwellAppState();
+}
+
+class _InkwellAppState extends ConsumerState<InkwellApp> {
+  late final AppLifecycleListener _lifecycleListener;
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycleListener = AppLifecycleListener(
+      onPause: () => ref.read(lockProvider.notifier).lock(),
+      onDetach: () => ref.read(lockProvider.notifier).lock(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _lifecycleListener.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final settings = ref.watch(settingsProvider);
     final router = ref.watch(routerProvider);
 

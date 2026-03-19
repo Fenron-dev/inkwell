@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inkwell/l10n/app_localizations.dart';
 
 import '../../core/export/export_service.dart';
+import '../../core/security/lock_provider.dart';
 import '../../core/settings/settings_provider.dart';
 import '../../core/vault/vault_provider.dart';
 import '../../theme/app_theme.dart';
+import '../lock/pin_setup_screen.dart';
 
 /// Settings screen for theme, font, language, vault configuration and export.
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -139,6 +141,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             const Divider(),
 
+            // App Lock
+            _AppLockSection(),
+            const Divider(),
+
             // Export
             if (vault != null)
               ListTile(
@@ -162,6 +168,70 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
       ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// App Lock section
+// ---------------------------------------------------------------------------
+
+class _AppLockSection extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final lock = ref.watch(lockProvider);
+
+    void pushSetup(PinSetupMode mode) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => PinSetupScreen(mode: mode)),
+      );
+    }
+
+    if (!lock.hasPIN) {
+      return ListTile(
+        leading: const Icon(Icons.lock_outline),
+        title: Text(l10n.settingsLock),
+        subtitle: Text(l10n.settingsLockEnable),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => pushSetup(PinSetupMode.setup),
+      );
+    }
+
+    return Column(
+      children: [
+        ListTile(
+          leading: const Icon(Icons.lock),
+          title: Text(l10n.settingsLock),
+          subtitle: Text(l10n.settingsLockActive),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton(
+                onPressed: () => pushSetup(PinSetupMode.change),
+                child: Text(l10n.lockChangePIN),
+              ),
+              TextButton(
+                onPressed: () => pushSetup(PinSetupMode.remove),
+                child: Text(
+                  l10n.lockRemovePIN,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.error),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (lock.biometricsAvailable)
+          SwitchListTile(
+            secondary: const Icon(Icons.fingerprint),
+            title: Text(l10n.settingsLockBiometrics),
+            subtitle: Text(l10n.settingsLockBiometricsHint),
+            value: lock.biometricsEnabled,
+            onChanged: (v) =>
+                ref.read(lockProvider.notifier).setBiometricsEnabled(v),
+          ),
+      ],
     );
   }
 }

@@ -155,13 +155,71 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportRunning => 'Creating ZIP archive…';
 
   @override
-  String exportDone(String path) => 'Saved: $path';
+  String exportDone(String path) {
+    return 'Saved: $path';
+  }
 
   @override
   String get exportCancelled => 'Export cancelled.';
 
   @override
-  String exportError(String error) => 'Export failed: $error';
+  String exportError(String error) {
+    return 'Export failed: $error';
+  }
+
+  @override
+  String get lockEnterPIN => 'Enter PIN';
+
+  @override
+  String get lockBiometricReason => 'Unlock Inkwell';
+
+  @override
+  String get lockWrongPIN => 'Wrong PIN';
+
+  @override
+  String get lockSetupTitle => 'Set PIN';
+
+  @override
+  String get lockSetupEnterNew => 'Enter new PIN';
+
+  @override
+  String get lockSetupConfirm => 'Confirm PIN';
+
+  @override
+  String get lockSetupNoMatch => "PINs don't match";
+
+  @override
+  String get lockSetupDone => 'PIN saved';
+
+  @override
+  String get lockChangePIN => 'Change PIN';
+
+  @override
+  String get lockRemovePIN => 'Remove PIN';
+
+  @override
+  String get lockRemoveCurrentHint => 'Enter current PIN to remove';
+
+  @override
+  String get lockRemoveDone => 'PIN removed';
+
+  @override
+  String get lockRemoveWrong => 'Wrong PIN — could not remove';
+
+  @override
+  String get settingsLock => 'App Lock';
+
+  @override
+  String get settingsLockEnable => 'Enable PIN lock';
+
+  @override
+  String get settingsLockActive => 'PIN active';
+
+  @override
+  String get settingsLockBiometrics => 'Use biometrics';
+
+  @override
+  String get settingsLockBiometricsHint => 'Fingerprint / Face ID';
 
   @override
   String get cancel => 'Cancel';

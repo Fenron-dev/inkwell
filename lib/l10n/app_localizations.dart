@@ -351,16 +351,82 @@ abstract class AppLocalizations {
   String get exportZip;
 
   /// Shown while the ZIP is being created
+  ///
+  /// In en, this message translates to:
+  /// **'Creating ZIP archive…'**
   String get exportRunning;
 
   /// Snackbar shown after a successful export
+  ///
+  /// In en, this message translates to:
+  /// **'Saved: {path}'**
   String exportDone(String path);
 
   /// Shown when user cancels the save dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Export cancelled.'**
   String get exportCancelled;
 
   /// Shown when the export throws an error
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
   String exportError(String error);
+
+  /// Prompt on lock screen
+  String get lockEnterPIN;
+
+  /// Reason string shown by the OS biometric dialog
+  String get lockBiometricReason;
+
+  /// Error shown after wrong PIN entry
+  String get lockWrongPIN;
+
+  /// Title for PIN setup screen
+  String get lockSetupTitle;
+
+  /// Prompt for entering a new PIN
+  String get lockSetupEnterNew;
+
+  /// Prompt to re-enter the PIN for confirmation
+  String get lockSetupConfirm;
+
+  /// Error when the two PINs differ
+  String get lockSetupNoMatch;
+
+  /// Snackbar after PIN is saved
+  String get lockSetupDone;
+
+  /// Button to change the PIN
+  String get lockChangePIN;
+
+  /// Button to remove the PIN
+  String get lockRemovePIN;
+
+  /// Hint on remove-PIN step
+  String get lockRemoveCurrentHint;
+
+  /// Snackbar after PIN is removed
+  String get lockRemoveDone;
+
+  /// Error when wrong PIN entered during remove
+  String get lockRemoveWrong;
+
+  /// Settings section title for App Lock
+  String get settingsLock;
+
+  /// Tile to enable PIN lock
+  String get settingsLockEnable;
+
+  /// Status label when PIN is set
+  String get settingsLockActive;
+
+  /// Toggle for biometric unlock
+  String get settingsLockBiometrics;
+
+  /// Subtitle for biometrics toggle
+  String get settingsLockBiometricsHint;
 
   /// Generic cancel button
   ///
