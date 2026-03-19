@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:inkwell/l10n/app_localizations.dart';
 
+import '../../core/search/search_provider.dart';
 import '../../core/vault/vault_provider.dart';
 import '../editor/editor_screen.dart';
 
@@ -48,6 +49,43 @@ class _DailyNotesScreenState extends ConsumerState<DailyNotesScreen> {
     });
   }
 
+  Future<void> _deleteEntry(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.deleteEntryTitle),
+        content: Text(l10n.deleteEntryHint),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final vault = ref.read(vaultProvider).valueOrNull;
+    if (vault == null) return;
+
+    final service = ref.read(vaultServiceProvider);
+    final filePath = service.entryPath(vault, _selectedDate);
+    await service.deleteEntry(vault, _selectedDate);
+
+    // Remove from search index (fire-and-forget).
+    ref.read(searchIndexProvider)?.removeEntry(filePath);
+
+    if (mounted) _goToToday();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -67,6 +105,11 @@ class _DailyNotesScreenState extends ConsumerState<DailyNotesScreen> {
               onPressed: _goToToday,
               child: Text(l10n.calendarToday),
             ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            tooltip: l10n.deleteEntryTooltip,
+            onPressed: () => _deleteEntry(context),
+          ),
         ],
       ),
       body: Column(

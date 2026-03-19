@@ -223,6 +223,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsLockBiometricsHint => 'Fingerabdruck / Face ID';
 
   @override
+  String get deleteEntryTitle => 'Eintrag löschen?';
+
+  @override
+  String get deleteEntryHint =>
+      'Diese Aktion kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get deleteEntryTooltip => 'Eintrag löschen';
+
+  @override
   String get cancel => 'Abbrechen';
 
   @override

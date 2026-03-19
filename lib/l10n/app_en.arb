@@ -151,6 +151,13 @@
   "settingsLockBiometricsHint": "Fingerprint / Face ID",
   "@settingsLockBiometricsHint": { "description": "Subtitle for biometrics toggle" },
 
+  "deleteEntryTitle": "Delete entry?",
+  "@deleteEntryTitle": { "description": "Confirmation dialog title for deleting an entry" },
+  "deleteEntryHint": "This cannot be undone.",
+  "@deleteEntryHint": { "description": "Warning text in delete confirmation dialog" },
+  "deleteEntryTooltip": "Delete entry",
+  "@deleteEntryTooltip": { "description": "Tooltip for the delete entry icon button" },
+
   "cancel": "Cancel",
   "@cancel": { "description": "Generic cancel button" },
   "save": "Save",

@@ -428,6 +428,15 @@ abstract class AppLocalizations {
   /// Subtitle for biometrics toggle
   String get settingsLockBiometricsHint;
 
+  /// Confirmation dialog title for deleting an entry
+  String get deleteEntryTitle;
+
+  /// Warning text in delete confirmation dialog
+  String get deleteEntryHint;
+
+  /// Tooltip for the delete entry icon button
+  String get deleteEntryTooltip;
+
   /// Generic cancel button
   ///
   /// In en, this message translates to:

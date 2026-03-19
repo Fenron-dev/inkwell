@@ -74,6 +74,10 @@
   "settingsLockBiometrics": "Biometrie nutzen",
   "settingsLockBiometricsHint": "Fingerabdruck / Face ID",
 
+  "deleteEntryTitle": "Eintrag löschen?",
+  "deleteEntryHint": "Diese Aktion kann nicht rückgängig gemacht werden.",
+  "deleteEntryTooltip": "Eintrag löschen",
+
   "cancel": "Abbrechen",
   "save": "Speichern",
   "delete": "Löschen",

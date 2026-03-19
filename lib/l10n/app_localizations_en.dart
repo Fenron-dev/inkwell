@@ -222,6 +222,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLockBiometricsHint => 'Fingerprint / Face ID';
 
   @override
+  String get deleteEntryTitle => 'Delete entry?';
+
+  @override
+  String get deleteEntryHint => 'This cannot be undone.';
+
+  @override
+  String get deleteEntryTooltip => 'Delete entry';
+
+  @override
   String get cancel => 'Cancel';
 
   @override
