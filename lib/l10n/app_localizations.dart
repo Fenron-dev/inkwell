@@ -386,7 +386,7 @@ abstract class AppLocalizations {
   /// **'Unlock Inkwell'**
   String get lockBiometricReason;
 
-  /// Hint shown below the fingerprint icon
+  /// Hint shown below the fingerprint icon on the biometric lock screen
   ///
   /// In en, this message translates to:
   /// **'Touch the sensor to unlock'**

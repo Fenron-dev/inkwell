@@ -57,6 +57,7 @@
 
   "lockEnterPIN": "PIN eingeben",
   "lockBiometricReason": "Inkwell entsperren",
+  "lockBiometricHint": "Sensor berühren zum Entsperren",
   "lockWrongPIN": "Falscher PIN",
   "lockSetupTitle": "PIN einrichten",
   "lockSetupEnterNew": "Neuen PIN eingeben",
@@ -85,5 +86,9 @@
   "cancel": "Abbrechen",
   "save": "Speichern",
   "delete": "Löschen",
-  "ok": "OK"
+  "ok": "OK",
+
+  "templateEditorTitle": "Vorlage bearbeiten",
+  "templateEditorHint": "Schreibe hier deine tägliche Vorlage…",
+  "templateSaved": "Vorlage gespeichert"
 }

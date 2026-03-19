@@ -118,6 +118,8 @@
   "@lockEnterPIN": { "description": "Prompt on lock screen" },
   "lockBiometricReason": "Unlock Inkwell",
   "@lockBiometricReason": { "description": "Reason string shown by the OS biometric dialog" },
+  "lockBiometricHint": "Touch the sensor to unlock",
+  "@lockBiometricHint": { "description": "Hint shown below the fingerprint icon on the biometric lock screen" },
   "lockWrongPIN": "Wrong PIN",
   "@lockWrongPIN": { "description": "Error shown after wrong PIN entry" },
   "lockSetupTitle": "Set PIN",
@@ -172,5 +174,12 @@
   "delete": "Delete",
   "@delete": { "description": "Generic delete button" },
   "ok": "OK",
-  "@ok": { "description": "Generic OK button" }
+  "@ok": { "description": "Generic OK button" },
+
+  "templateEditorTitle": "Edit Template",
+  "@templateEditorTitle": { "description": "AppBar title for the template editor screen" },
+  "templateEditorHint": "Write your daily template here…",
+  "@templateEditorHint": { "description": "Hint text in the template editor" },
+  "templateSaved": "Template saved",
+  "@templateSaved": { "description": "Snackbar after the template is saved" }
 }
