@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:math';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +17,7 @@ import '../../models/frontmatter.dart';
 import '../../models/journal_entry.dart';
 import 'markdown_toolbar.dart';
 import 'properties_panel.dart';
+import 'writing_prompts.dart';
 
 /// The main markdown editor with auto-save and switchable preview modes.
 class EditorScreen extends ConsumerStatefulWidget {
@@ -35,6 +39,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   bool _loading = true;
   EditorMode _mode = EditorMode.edit;
   bool _showProperties = false;
+  bool _showPrompts = false;
+  String _promptCategory = 'general';
+  int _promptIndex = 0;
+  final _rng = Random();
 
   @override
   void initState() {
@@ -100,10 +108,40 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     _saveTimer = Timer(const Duration(milliseconds: 500), _saveNow);
   }
 
+  Future<String?> _pickAndInsertImage() async {
+    final vault = ref.read(vaultProvider).valueOrNull;
+    if (vault == null) return null;
+
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: false,
+    );
+    if (result == null || result.files.isEmpty) return null;
+    final sourcePath = result.files.first.path;
+    if (sourcePath == null) return null;
+
+    final service = ref.read(vaultServiceProvider);
+    return service.saveAttachment(vault, sourcePath, widget.date);
+  }
+
+  List<String> _currentPrompts(String langCode) {
+    final lang = kWritingPrompts.containsKey(langCode) ? langCode : 'en';
+    return kWritingPrompts[lang]![_promptCategory] ?? [];
+  }
+
+  void _shufflePrompt(String langCode) {
+    final prompts = _currentPrompts(langCode);
+    if (prompts.isEmpty) return;
+    setState(() {
+      _promptIndex = _rng.nextInt(prompts.length);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isWide = MediaQuery.sizeOf(context).width >= 600;
+    final langCode = Localizations.localeOf(context).languageCode;
 
     if (_loading) {
       return const Center(child: CircularProgressIndicator());
@@ -144,6 +182,21 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 ),
               ],
               const Spacer(),
+              // Writing prompts toggle
+              IconButton(
+                icon: Icon(
+                  _showPrompts
+                      ? Icons.lightbulb
+                      : Icons.lightbulb_outline,
+                  size: 20,
+                ),
+                color: _showPrompts
+                    ? Theme.of(context).colorScheme.primary
+                    : null,
+                tooltip: l10n.promptsTitle,
+                onPressed: () =>
+                    setState(() => _showPrompts = !_showPrompts),
+              ),
               // Properties toggle
               IconButton(
                 icon: Icon(
@@ -173,9 +226,42 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 )
               : const SizedBox.shrink(),
         ),
+        // Collapsible writing prompts panel
+        AnimatedSize(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          child: _showPrompts
+              ? _PromptsPanel(
+                  langCode: langCode,
+                  category: _promptCategory,
+                  promptIndex: _promptIndex,
+                  onCategoryChanged: (cat) => setState(() {
+                    _promptCategory = cat;
+                    _promptIndex = 0;
+                  }),
+                  onShuffle: () => _shufflePrompt(langCode),
+                  onInsert: (text) {
+                    final ctrl = _controller;
+                    final sel = ctrl.selection;
+                    final pos = sel.isValid ? sel.end : ctrl.text.length;
+                    final insert = '\n\n> $text\n\n';
+                    ctrl.value = TextEditingValue(
+                      text: ctrl.text.replaceRange(pos, pos, insert),
+                      selection: TextSelection.collapsed(
+                          offset: pos + insert.length),
+                    );
+                    _focusNode.requestFocus();
+                  },
+                )
+              : const SizedBox.shrink(),
+        ),
         // Markdown toolbar — only in edit / split mode
         if (_mode != EditorMode.preview)
-          MarkdownToolbar(controller: _controller, focusNode: _focusNode),
+          MarkdownToolbar(
+            controller: _controller,
+            focusNode: _focusNode,
+            onPickImage: _pickAndInsertImage,
+          ),
         // Editor / Preview area
         Expanded(child: _buildEditorArea(context)),
         // Word / char count footer
@@ -227,6 +313,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   }
 
   Widget _buildPreview() {
+    final vault = ref.read(vaultProvider).valueOrNull;
     return Markdown(
       data: _preprocessForPreview(_controller.text),
       selectable: true,
@@ -253,6 +340,20 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           launchUrl(uri, mode: LaunchMode.externalApplication);
         }
       },
+      // ignore: deprecated_member_use
+      imageBuilder: vault == null
+          ? null
+          : (uri, title, alt) {
+              final uriStr = uri.toString();
+              // Resolve vault-relative paths (e.g. _attachments/…)
+              final absPath = uriStr.startsWith('/')
+                  ? uriStr
+                  : '${vault.path}/$uriStr';
+              return Image.file(
+                File(absPath),
+                errorBuilder: (_, _, _) => const Icon(Icons.broken_image),
+              );
+            },
     );
   }
 
@@ -567,6 +668,105 @@ class _WordCountBarState extends State<_WordCountBar> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text('$_words words · $_chars chars', style: style),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Writing prompts panel
+// ---------------------------------------------------------------------------
+
+class _PromptsPanel extends StatelessWidget {
+  final String langCode;
+  final String category;
+  final int promptIndex;
+  final void Function(String) onCategoryChanged;
+  final VoidCallback onShuffle;
+  final void Function(String) onInsert;
+
+  const _PromptsPanel({
+    required this.langCode,
+    required this.category,
+    required this.promptIndex,
+    required this.onCategoryChanged,
+    required this.onShuffle,
+    required this.onInsert,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    final lang = kWritingPrompts.containsKey(langCode) ? langCode : 'en';
+    final prompts = kWritingPrompts[lang]![category] ?? [];
+    final prompt = prompts.isEmpty ? '' : prompts[promptIndex % prompts.length];
+
+    final categories = <(String, String)>[
+      ('general', l10n.promptsCategoryGeneral),
+      ('reflection', l10n.promptsCategoryReflection),
+      ('gratitude', l10n.promptsCategoryGratitude),
+      ('creativity', l10n.promptsCategoryCreativity),
+    ];
+
+    return Container(
+      color: scheme.surfaceContainerLow,
+      padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Category chips
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: categories.map((c) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: FilterChip(
+                    label: Text(c.$2),
+                    selected: category == c.$1,
+                    showCheckmark: false,
+                    onSelected: (_) => onCategoryChanged(c.$1),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          // Prompt text
+          Text(
+            prompt,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontStyle: FontStyle.italic,
+                  color: scheme.onSurfaceVariant,
+                ),
+          ),
+          const SizedBox(height: 8),
+          // Action buttons
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton.icon(
+                onPressed: onShuffle,
+                icon: const Icon(Icons.shuffle, size: 16),
+                label: Text(l10n.promptsShuffle),
+                style: TextButton.styleFrom(
+                    visualDensity: VisualDensity.compact),
+              ),
+              const SizedBox(width: 8),
+              FilledButton.tonalIcon(
+                onPressed: prompt.isEmpty ? null : () => onInsert(prompt),
+                icon: const Icon(Icons.add, size: 16),
+                label: Text(l10n.promptsInsert),
+                style: FilledButton.styleFrom(
+                    visualDensity: VisualDensity.compact),
+              ),
+            ],
+          ),
         ],
       ),
     );

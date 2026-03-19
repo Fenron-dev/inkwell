@@ -90,5 +90,18 @@
 
   "templateEditorTitle": "Vorlage bearbeiten",
   "templateEditorHint": "Schreibe hier deine tägliche Vorlage…",
-  "templateSaved": "Vorlage gespeichert"
+  "templateSaved": "Vorlage gespeichert",
+
+  "onThisDayTitle": "Heute vor…",
+  "onThisDayYearsAgo": "{years, plural, =1{vor 1 Jahr} other{vor {years} Jahren}}",
+
+  "promptsTitle": "Schreibimpulse",
+  "promptsInsert": "Einfügen",
+  "promptsShuffle": "Neu laden",
+  "promptsCategoryGeneral": "Allgemein",
+  "promptsCategoryReflection": "Reflexion",
+  "promptsCategoryGratitude": "Dankbarkeit",
+  "promptsCategoryCreativity": "Kreativität",
+
+  "insertImage": "Bild einfügen"
 }

@@ -5,6 +5,7 @@ import 'package:inkwell/l10n/app_localizations.dart';
 
 import '../../core/search/search_provider.dart';
 import '../../core/vault/vault_provider.dart';
+import '../../models/journal_entry.dart';
 import '../editor/editor_screen.dart';
 
 /// Daily notes view with day navigation and editor.
@@ -21,11 +22,14 @@ class DailyNotesScreen extends ConsumerStatefulWidget {
 
 class _DailyNotesScreenState extends ConsumerState<DailyNotesScreen> {
   late DateTime _selectedDate;
+  List<JournalEntry> _memories = [];
+  bool _memoriesLoaded = false;
 
   @override
   void initState() {
     super.initState();
     _selectedDate = widget.initialDate ?? DateTime.now();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadMemories());
   }
 
   @override
@@ -33,20 +37,45 @@ class _DailyNotesScreenState extends ConsumerState<DailyNotesScreen> {
     super.didUpdateWidget(oldWidget);
     if (widget.initialDate != null &&
         widget.initialDate != oldWidget.initialDate) {
-      setState(() => _selectedDate = widget.initialDate!);
+      setState(() {
+        _selectedDate = widget.initialDate!;
+        _memoriesLoaded = false;
+        _memories = [];
+      });
+      _loadMemories();
+    }
+  }
+
+  Future<void> _loadMemories() async {
+    final vault = ref.read(vaultProvider).valueOrNull;
+    if (vault == null) return;
+    final service = ref.read(vaultServiceProvider);
+    final entries =
+        await service.findEntriesOnThisDay(vault, _selectedDate);
+    if (mounted) {
+      setState(() {
+        _memories = entries;
+        _memoriesLoaded = true;
+      });
     }
   }
 
   void _goToDay(int offset) {
     setState(() {
       _selectedDate = _selectedDate.add(Duration(days: offset));
+      _memoriesLoaded = false;
+      _memories = [];
     });
+    _loadMemories();
   }
 
   void _goToToday() {
     setState(() {
       _selectedDate = DateTime.now();
+      _memoriesLoaded = false;
+      _memories = [];
     });
+    _loadMemories();
   }
 
   Future<void> _deleteEntry(BuildContext context) async {
@@ -132,6 +161,18 @@ class _DailyNotesScreenState extends ConsumerState<DailyNotesScreen> {
             ),
           ),
           const Divider(height: 1),
+          // "An diesem Tag" memories banner
+          if (_memoriesLoaded && _memories.isNotEmpty)
+            _MemoriesBanner(
+              memories: _memories,
+              currentYear: _selectedDate.year,
+              onTap: (date) => setState(() {
+                _selectedDate = date;
+                _memoriesLoaded = false;
+                _memories = [];
+                _loadMemories();
+              }),
+            ),
           // Editor area
           Expanded(
             child: vault.when(
@@ -150,6 +191,110 @@ class _DailyNotesScreenState extends ConsumerState<DailyNotesScreen> {
               error: (e, _) => Center(child: Text('Error: $e')),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Memories banner — shows past entries from the same month+day
+// ---------------------------------------------------------------------------
+
+class _MemoriesBanner extends StatelessWidget {
+  final List<JournalEntry> memories;
+  final int currentYear;
+  final void Function(DateTime) onTap;
+
+  const _MemoriesBanner({
+    required this.memories,
+    required this.currentYear,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+
+    return Container(
+      color: scheme.secondaryContainer.withAlpha(100),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+            child: Row(
+              children: [
+                Icon(Icons.history, size: 14, color: scheme.secondary),
+                const SizedBox(width: 6),
+                Text(
+                  l10n.onThisDayTitle,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: scheme.secondary,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+            child: Row(
+              children: memories.map((entry) {
+                final years = currentYear - entry.date.year;
+                final label = l10n.onThisDayYearsAgo(years);
+                // First non-empty, non-heading line as snippet
+                final snippet = entry.body
+                    .split('\n')
+                    .where((l) =>
+                        l.trim().isNotEmpty && !l.trim().startsWith('#'))
+                    .take(1)
+                    .join();
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: InkWell(
+                    onTap: () => onTap(entry.date),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      width: 180,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: scheme.secondaryContainer,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            label,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall
+                                ?.copyWith(color: scheme.secondary),
+                          ),
+                          if (snippet.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              snippet,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          Divider(height: 1, color: scheme.outlineVariant),
         ],
       ),
     );

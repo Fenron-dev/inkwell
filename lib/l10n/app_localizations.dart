@@ -565,6 +565,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Template saved'**
   String get templateSaved;
+
+  /// Header for the 'On This Day' memories banner
+  ///
+  /// In en, this message translates to:
+  /// **'On This Day'**
+  String get onThisDayTitle;
+
+  /// Label showing how many years ago a past entry was written
+  ///
+  /// In en, this message translates to:
+  /// **'{years, plural, =1{1 year ago} other{{years} years ago}}'**
+  String onThisDayYearsAgo(int years);
+
+  /// Title for the writing prompts panel
+  ///
+  /// In en, this message translates to:
+  /// **'Writing Prompts'**
+  String get promptsTitle;
+
+  /// Button to insert a writing prompt into the editor
+  ///
+  /// In en, this message translates to:
+  /// **'Insert'**
+  String get promptsInsert;
+
+  /// Button to show a different writing prompt
+  ///
+  /// In en, this message translates to:
+  /// **'Shuffle'**
+  String get promptsShuffle;
+
+  /// Writing prompt category: general
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get promptsCategoryGeneral;
+
+  /// Writing prompt category: reflection
+  ///
+  /// In en, this message translates to:
+  /// **'Reflection'**
+  String get promptsCategoryReflection;
+
+  /// Writing prompt category: gratitude
+  ///
+  /// In en, this message translates to:
+  /// **'Gratitude'**
+  String get promptsCategoryGratitude;
+
+  /// Writing prompt category: creativity
+  ///
+  /// In en, this message translates to:
+  /// **'Creativity'**
+  String get promptsCategoryCreativity;
+
+  /// Tooltip for the insert image toolbar button
+  ///
+  /// In en, this message translates to:
+  /// **'Insert image'**
+  String get insertImage;
 }
 
 class _AppLocalizationsDelegate

@@ -205,4 +205,73 @@ tags: []
     }
     await File('${vault.templatesPath}/daily.md').writeAsString(content);
   }
+
+  /// Copies a file into the vault's `_attachments/YYYY/MM/` folder.
+  ///
+  /// Returns the vault-relative path, e.g. `_attachments/2026/03/2026-03-19-1234567890.jpg`.
+  Future<String> saveAttachment(
+    VaultConfig vault,
+    String sourcePath,
+    DateTime date,
+  ) async {
+    final year = date.year.toString().padLeft(4, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final dir = Directory('${vault.attachmentsPath}/$year/$month');
+    if (!await dir.exists()) {
+      await dir.create(recursive: true);
+    }
+
+    final ext = p.extension(sourcePath);
+    final stem = _dateFormat.format(date);
+    final ts = DateTime.now().millisecondsSinceEpoch;
+    final name = '$stem-$ts$ext';
+    await File(sourcePath).copy('${dir.path}/$name');
+
+    return '_attachments/$year/$month/$name';
+  }
+
+  /// Returns entries from previous years that share the same month + day.
+  Future<List<JournalEntry>> findEntriesOnThisDay(
+    VaultConfig vault,
+    DateTime date,
+  ) async {
+    final journalDir = Directory(vault.journalPath);
+    if (!await journalDir.exists()) return [];
+
+    final suffix =
+        '-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    final results = <JournalEntry>[];
+
+    await for (final yearDir in journalDir.list()) {
+      if (yearDir is! Directory) continue;
+      final yearName = p.basename(yearDir.path);
+      final year = int.tryParse(yearName);
+      if (year == null || year == date.year) continue;
+
+      await for (final monthDir in yearDir.list()) {
+        if (monthDir is! Directory) continue;
+        await for (final file in monthDir.list()) {
+          if (file is! File || !file.path.endsWith('.md')) continue;
+          final fileName = p.basenameWithoutExtension(file.path);
+          if (!fileName.endsWith(suffix)) continue;
+          final entryDate = DateTime.tryParse(fileName);
+          if (entryDate == null) continue;
+
+          final raw = await file.readAsString();
+          final stat = await file.stat();
+          final (frontmatter, body) = FrontmatterParser.parse(raw);
+          results.add(JournalEntry(
+            filePath: file.path,
+            date: entryDate,
+            frontmatter: frontmatter,
+            body: body,
+            lastModified: stat.modified,
+          ));
+        }
+      }
+    }
+
+    results.sort((a, b) => b.date.compareTo(a.date));
+    return results;
+  }
 }

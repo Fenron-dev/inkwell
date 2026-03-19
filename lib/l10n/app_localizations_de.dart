@@ -265,4 +265,42 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get templateSaved => 'Vorlage gespeichert';
+
+  @override
+  String get onThisDayTitle => 'Heute vor…';
+
+  @override
+  String onThisDayYearsAgo(int years) {
+    String _temp0 = intl.Intl.pluralLogic(
+      years,
+      locale: localeName,
+      other: 'vor $years Jahren',
+      one: 'vor 1 Jahr',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get promptsTitle => 'Schreibimpulse';
+
+  @override
+  String get promptsInsert => 'Einfügen';
+
+  @override
+  String get promptsShuffle => 'Neu laden';
+
+  @override
+  String get promptsCategoryGeneral => 'Allgemein';
+
+  @override
+  String get promptsCategoryReflection => 'Reflexion';
+
+  @override
+  String get promptsCategoryGratitude => 'Dankbarkeit';
+
+  @override
+  String get promptsCategoryCreativity => 'Kreativität';
+
+  @override
+  String get insertImage => 'Bild einfügen';
 }

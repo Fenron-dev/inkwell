@@ -181,5 +181,31 @@
   "templateEditorHint": "Write your daily template here…",
   "@templateEditorHint": { "description": "Hint text in the template editor" },
   "templateSaved": "Template saved",
-  "@templateSaved": { "description": "Snackbar after the template is saved" }
+  "@templateSaved": { "description": "Snackbar after the template is saved" },
+
+  "onThisDayTitle": "On This Day",
+  "@onThisDayTitle": { "description": "Header for the 'On This Day' memories banner" },
+  "onThisDayYearsAgo": "{years, plural, =1{1 year ago} other{{years} years ago}}",
+  "@onThisDayYearsAgo": {
+    "description": "Label showing how many years ago a past entry was written",
+    "placeholders": { "years": { "type": "int" } }
+  },
+
+  "promptsTitle": "Writing Prompts",
+  "@promptsTitle": { "description": "Title for the writing prompts panel" },
+  "promptsInsert": "Insert",
+  "@promptsInsert": { "description": "Button to insert a writing prompt into the editor" },
+  "promptsShuffle": "Shuffle",
+  "@promptsShuffle": { "description": "Button to show a different writing prompt" },
+  "promptsCategoryGeneral": "General",
+  "@promptsCategoryGeneral": { "description": "Writing prompt category: general" },
+  "promptsCategoryReflection": "Reflection",
+  "@promptsCategoryReflection": { "description": "Writing prompt category: reflection" },
+  "promptsCategoryGratitude": "Gratitude",
+  "@promptsCategoryGratitude": { "description": "Writing prompt category: gratitude" },
+  "promptsCategoryCreativity": "Creativity",
+  "@promptsCategoryCreativity": { "description": "Writing prompt category: creativity" },
+
+  "insertImage": "Insert image",
+  "@insertImage": { "description": "Tooltip for the insert image toolbar button" }
 }

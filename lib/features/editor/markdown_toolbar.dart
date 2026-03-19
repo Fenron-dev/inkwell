@@ -17,10 +17,16 @@ class MarkdownToolbar extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
 
+  /// Called when the user taps the image button. The callback should pick a
+  /// file, save it to the vault, and return the vault-relative path. If the
+  /// user cancels, it should return null.
+  final Future<String?> Function()? onPickImage;
+
   const MarkdownToolbar({
     super.key,
     required this.controller,
     required this.focusNode,
+    this.onPickImage,
   });
 
   @override
@@ -108,6 +114,11 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
 
             // ── Insert ─────────────────────────────────────────────────────
             _LinkBtn(helper: h),
+            if (widget.onPickImage != null)
+              _Btn(Icons.image_outlined, 'Insert image', () async {
+                final path = await widget.onPickImage!();
+                if (path != null) h.insertImage(path);
+              }),
             _Btn(Icons.tag, 'Wikilink',   () => h.wrap('[[', ']]')),
             _Btn(Icons.comment_outlined, 'Comment (%% … %%)', () => h.wrap('%% ', ' %%')),
             const _Sep(),
@@ -297,6 +308,11 @@ class _MdHelper {
         '| Cell | Cell | Cell |\n'
         '| Cell | Cell | Cell |\n\n';
     _insertAt(t, t.length);
+  }
+
+  void insertImage(String vaultRelativePath) {
+    final alt = vaultRelativePath.split('/').last.replaceAll(RegExp(r'\.\w+$'), '');
+    _insertAt('![$alt]($vaultRelativePath)', '![$alt]($vaultRelativePath)'.length);
   }
 
   void insertCallout(String type) {
