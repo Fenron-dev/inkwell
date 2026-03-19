@@ -207,5 +207,23 @@
   "@promptsCategoryCreativity": { "description": "Writing prompt category: creativity" },
 
   "insertImage": "Insert image",
-  "@insertImage": { "description": "Tooltip for the insert image toolbar button" }
+  "@insertImage": { "description": "Tooltip for the insert image toolbar button" },
+
+  "sttDictate": "Dictate",
+  "@sttDictate": { "description": "Tooltip for the voice dictation toolbar button" },
+  "sttListening": "Listening…",
+  "@sttListening": { "description": "Status text shown while STT is active" },
+  "sttNotAvailable": "Speech recognition is not available on this device",
+  "@sttNotAvailable": { "description": "Error shown when STT is unavailable" },
+
+  "quickCaptureTitle": "Quick Capture",
+  "@quickCaptureTitle": { "description": "Title for the quick capture dialog" },
+  "quickCaptureHint": "Add a quick note…",
+  "@quickCaptureHint": { "description": "Placeholder in the quick capture text field" },
+  "quickCaptureSave": "Append to Today",
+  "@quickCaptureSave": { "description": "Button in quick capture dialog" },
+  "quickCaptureSaved": "Appended to today's entry",
+  "@quickCaptureSaved": { "description": "Snackbar after quick capture is saved" },
+  "quickCaptureTooltip": "Quick capture",
+  "@quickCaptureTooltip": { "description": "Tooltip for the quick capture FAB" }
 }

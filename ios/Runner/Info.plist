@@ -61,6 +61,10 @@
 	</array>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Inkwell uses Face ID to unlock your journal.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Inkwell uses the microphone to transcribe your voice into journal entries.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Inkwell uses speech recognition to convert your spoken words to text.</string>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inkwell/l10n/app_localizations.dart';
 
 // ---------------------------------------------------------------------------
 // Public widget
@@ -22,11 +23,17 @@ class MarkdownToolbar extends StatefulWidget {
   /// user cancels, it should return null.
   final Future<String?> Function()? onPickImage;
 
+  /// Called when the mic button is tapped. [isSttListening] drives the icon.
+  final VoidCallback? onStt;
+  final bool isSttListening;
+
   const MarkdownToolbar({
     super.key,
     required this.controller,
     required this.focusNode,
     this.onPickImage,
+    this.onStt,
+    this.isSttListening = false,
   });
 
   @override
@@ -68,6 +75,7 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
   @override
   Widget build(BuildContext context) {
     final h = _MdHelper(widget.controller, widget.focusNode, _savedSel);
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -132,6 +140,16 @@ class _MarkdownToolbarState extends State<MarkdownToolbar> {
             _Btn(Icons.format_align_left,   'Align left',   () => h.setAlignment('left')),
             _Btn(Icons.format_align_center, 'Align center', () => h.setAlignment('center')),
             _Btn(Icons.format_align_right,  'Align right',  () => h.setAlignment('right')),
+
+            // ── Dictation ─────────────────────────────────────────────────
+            if (widget.onStt != null) ...[
+              const _Sep(),
+              _SttBtn(
+                tooltip: l10n.sttDictate,
+                listening: widget.isSttListening,
+                onTap: widget.onStt!,
+              ),
+            ],
           ],
         ),
       ),
@@ -529,6 +547,45 @@ class _LinkBtn extends StatelessWidget {
     }
     displayCtrl.dispose();
     urlCtrl.dispose();
+  }
+}
+
+// ---------------------------------------------------------------------------
+// STT mic button  ▸  pulses red while listening
+// ---------------------------------------------------------------------------
+
+class _SttBtn extends StatelessWidget {
+  final String tooltip;
+  final bool listening;
+  final VoidCallback onTap;
+
+  const _SttBtn({
+    required this.tooltip,
+    required this.listening,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = listening
+        ? Theme.of(context).colorScheme.error
+        : null;
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(4),
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: Icon(
+            listening ? Icons.mic : Icons.mic_none,
+            size: 18,
+            color: color,
+          ),
+        ),
+      ),
+    );
   }
 }
 

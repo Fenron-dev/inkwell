@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:inkwell/l10n/app_localizations.dart';
+
+import '../features/quick_capture/quick_capture_dialog.dart';
 
 /// Responsive shell that shows a NavigationBar on mobile
 /// and a NavigationRail on desktop/tablet.
@@ -24,6 +27,25 @@ class AdaptiveShell extends StatelessWidget {
       _Destination(icon: Icons.settings, label: l10n?.navSettings ?? 'Einstellungen'),
     ];
 
+    final fab = FloatingActionButton(
+      heroTag: 'quickCapture',
+      tooltip: l10n?.quickCaptureTooltip ?? 'Quick Capture',
+      onPressed: () => QuickCaptureDialog.show(context),
+      child: const Icon(Icons.add),
+    );
+
+    // Ctrl+Shift+Space opens quick capture while the app is focused
+    final shell = CallbackShortcuts(
+      bindings: {
+        const SingleActivator(
+          LogicalKeyboardKey.space,
+          control: true,
+          shift: true,
+        ): () => QuickCaptureDialog.show(context),
+      },
+      child: Focus(autofocus: false, child: navigationShell),
+    );
+
     if (isWide) {
       return Scaffold(
         body: Row(
@@ -41,14 +63,15 @@ class AdaptiveShell extends StatelessWidget {
                   .toList(),
             ),
             const VerticalDivider(thickness: 1, width: 1),
-            Expanded(child: navigationShell),
+            Expanded(child: shell),
           ],
         ),
+        floatingActionButton: fab,
       );
     }
 
     return Scaffold(
-      body: navigationShell,
+      body: shell,
       bottomNavigationBar: NavigationBar(
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: (index) => navigationShell.goBranch(index),
@@ -59,6 +82,7 @@ class AdaptiveShell extends StatelessWidget {
                 ))
             .toList(),
       ),
+      floatingActionButton: fab,
     );
   }
 }

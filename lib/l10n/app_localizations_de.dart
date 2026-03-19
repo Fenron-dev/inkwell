@@ -303,4 +303,29 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get insertImage => 'Bild einfügen';
+
+  @override
+  String get sttDictate => 'Diktieren';
+
+  @override
+  String get sttListening => 'Hört zu…';
+
+  @override
+  String get sttNotAvailable =>
+      'Spracheingabe auf diesem Gerät nicht verfügbar';
+
+  @override
+  String get quickCaptureTitle => 'Schnell erfassen';
+
+  @override
+  String get quickCaptureHint => 'Kurze Notiz hinzufügen…';
+
+  @override
+  String get quickCaptureSave => 'Zu heute hinzufügen';
+
+  @override
+  String get quickCaptureSaved => 'Zu heutigem Eintrag hinzugefügt';
+
+  @override
+  String get quickCaptureTooltip => 'Schnell erfassen';
 }

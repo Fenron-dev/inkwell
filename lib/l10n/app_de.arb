@@ -103,5 +103,15 @@
   "promptsCategoryGratitude": "Dankbarkeit",
   "promptsCategoryCreativity": "Kreativität",
 
-  "insertImage": "Bild einfügen"
+  "insertImage": "Bild einfügen",
+
+  "sttDictate": "Diktieren",
+  "sttListening": "Hört zu…",
+  "sttNotAvailable": "Spracheingabe auf diesem Gerät nicht verfügbar",
+
+  "quickCaptureTitle": "Schnell erfassen",
+  "quickCaptureHint": "Kurze Notiz hinzufügen…",
+  "quickCaptureSave": "Zu heute hinzufügen",
+  "quickCaptureSaved": "Zu heutigem Eintrag hinzugefügt",
+  "quickCaptureTooltip": "Schnell erfassen"
 }

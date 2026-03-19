@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:speech_to_text/speech_to_text.dart';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -44,10 +46,15 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   int _promptIndex = 0;
   final _rng = Random();
 
+  final _stt = SpeechToText();
+  bool _sttAvailable = false;
+  bool _sttListening = false;
+
   @override
   void initState() {
     super.initState();
     _loadEntry();
+    _initStt();
   }
 
   @override
@@ -106,6 +113,50 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     });
     _saveTimer?.cancel();
     _saveTimer = Timer(const Duration(milliseconds: 500), _saveNow);
+  }
+
+  Future<void> _initStt() async {
+    final available = await _stt.initialize(onError: (_) {
+      if (mounted) setState(() => _sttListening = false);
+    });
+    if (mounted) setState(() => _sttAvailable = available);
+  }
+
+  Future<void> _toggleStt() async {
+    if (!_sttAvailable) {
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.sttNotAvailable)),
+        );
+      }
+      return;
+    }
+    if (_sttListening) {
+      await _stt.stop();
+      if (mounted) setState(() => _sttListening = false);
+    } else {
+      setState(() => _sttListening = true);
+      final locale = Localizations.localeOf(context).toLanguageTag();
+      await _stt.listen(
+        localeId: locale,
+        onResult: (result) {
+          if (result.finalResult && result.recognizedWords.isNotEmpty) {
+            final words = result.recognizedWords;
+            final sel = _controller.selection;
+            final pos =
+                sel.isValid ? sel.end : _controller.text.length;
+            final insert = '${pos > 0 ? ' ' : ''}$words';
+            _controller.value = TextEditingValue(
+              text: _controller.text.replaceRange(pos, pos, insert),
+              selection: TextSelection.collapsed(
+                  offset: pos + insert.length),
+            );
+            if (mounted) setState(() => _sttListening = false);
+          }
+        },
+      );
+    }
   }
 
   Future<String?> _pickAndInsertImage() async {
@@ -261,7 +312,12 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             controller: _controller,
             focusNode: _focusNode,
             onPickImage: _pickAndInsertImage,
+            onStt: _sttAvailable ? _toggleStt : null,
+            isSttListening: _sttListening,
           ),
+        // STT listening indicator
+        if (_sttListening)
+          _SttListeningBar(l10n: l10n),
         // Editor / Preview area
         Expanded(child: _buildEditorArea(context)),
         // Word / char count footer
@@ -668,6 +724,37 @@ class _WordCountBarState extends State<_WordCountBar> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Text('$_words words · $_chars chars', style: style),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// STT listening indicator bar
+// ---------------------------------------------------------------------------
+
+class _SttListeningBar extends StatelessWidget {
+  final AppLocalizations l10n;
+  const _SttListeningBar({required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      color: scheme.errorContainer,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Row(
+        children: [
+          Icon(Icons.mic, size: 16, color: scheme.onErrorContainer),
+          const SizedBox(width: 8),
+          Text(
+            l10n.sttListening,
+            style: Theme.of(context)
+                .textTheme
+                .labelMedium
+                ?.copyWith(color: scheme.onErrorContainer),
+          ),
         ],
       ),
     );

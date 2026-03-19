@@ -625,6 +625,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Insert image'**
   String get insertImage;
+
+  /// Tooltip for the voice dictation toolbar button
+  ///
+  /// In en, this message translates to:
+  /// **'Dictate'**
+  String get sttDictate;
+
+  /// Status text shown while STT is active
+  ///
+  /// In en, this message translates to:
+  /// **'Listening…'**
+  String get sttListening;
+
+  /// Error shown when STT is unavailable
+  ///
+  /// In en, this message translates to:
+  /// **'Speech recognition is not available on this device'**
+  String get sttNotAvailable;
+
+  /// Title for the quick capture dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Capture'**
+  String get quickCaptureTitle;
+
+  /// Placeholder in the quick capture text field
+  ///
+  /// In en, this message translates to:
+  /// **'Add a quick note…'**
+  String get quickCaptureHint;
+
+  /// Button in quick capture dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Append to Today'**
+  String get quickCaptureSave;
+
+  /// Snackbar after quick capture is saved
+  ///
+  /// In en, this message translates to:
+  /// **'Appended to today\'s entry'**
+  String get quickCaptureSaved;
+
+  /// Tooltip for the quick capture FAB
+  ///
+  /// In en, this message translates to:
+  /// **'Quick capture'**
+  String get quickCaptureTooltip;
 }
 
 class _AppLocalizationsDelegate

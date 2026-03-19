@@ -58,6 +58,9 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   crypto: ^3.0.6
 
+  # Speech-to-Text (dictation in editor)
+  speech_to_text: ^7.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
