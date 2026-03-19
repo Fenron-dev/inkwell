@@ -10,6 +10,7 @@ import '../../core/settings/settings_provider.dart';
 import '../../core/vault/vault_provider.dart';
 import '../../models/frontmatter.dart';
 import '../../models/journal_entry.dart';
+import 'markdown_toolbar.dart';
 import 'properties_panel.dart';
 
 /// The main markdown editor with auto-save and switchable preview modes.
@@ -170,7 +171,9 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                 )
               : const SizedBox.shrink(),
         ),
-        const Divider(height: 1),
+        // Markdown toolbar — only in edit / split mode
+        if (_mode != EditorMode.preview)
+          MarkdownToolbar(controller: _controller, focusNode: _focusNode),
         // Editor / Preview area
         Expanded(child: _buildEditorArea(context)),
       ],
