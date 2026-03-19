@@ -276,7 +276,7 @@ class _MdHelper {
 
   // ── Block insertions ───────────────────────────────────────────────────
 
-  void insertHR() => _insertAt('\n\n---\n\n', 0);
+  void insertHR() => _insertAt('\n\n---\n\n', '\n\n---\n\n'.length);
 
   void insertCodeBlock() {
     if (!_hasSel) {

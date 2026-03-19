@@ -50,6 +50,9 @@ dependencies:
   # ZIP Export
   archive: ^3.6.1
 
+  # Link opening
+  url_launcher: ^6.3.1
+
   # App Lock
   local_auth: ^2.3.0
   flutter_secure_storage: ^9.2.4

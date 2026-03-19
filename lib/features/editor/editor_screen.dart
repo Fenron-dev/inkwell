@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:markdown/markdown.dart' as md;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:inkwell/l10n/app_localizations.dart';
 
 import '../../core/search/search_provider.dart';
@@ -230,48 +231,198 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       data: _preprocessForPreview(_controller.text),
       selectable: true,
       padding: const EdgeInsets.all(16),
-      extensionSet: md.ExtensionSet.gitHubFlavored,
-      inlineSyntaxes: [_HighlightSyntax()],
-      builders: {'mark': _HighlightBuilder()},
-    );
-  }
-
-  /// Pre-processes raw markdown before rendering:
-  /// - Converts Obsidian callouts `> [!type]` to styled blockquotes with emoji.
-  static String _preprocessForPreview(String text) {
-    return text.replaceAllMapped(
-      RegExp(r'^> \[!(\w+)\][ \t]*([^\n]*)', multiLine: true),
-      (m) {
-        final type = m[1]!;
-        final title = m[2]!.trim();
-        final icon = _calloutIcon(type.toLowerCase());
-        final label = title.isNotEmpty
-            ? '$icon **${type.toUpperCase()}: $title**'
-            : '$icon **${type.toUpperCase()}**';
-        return '> $label';
+      // gitHubWeb adds task-list checkboxes on top of gitHubFlavored
+      extensionSet: md.ExtensionSet.gitHubWeb,
+      // _CalloutSyntax must come first so it wins over BlockquoteSyntax
+      blockSyntaxes: const [_CalloutSyntax()],
+      inlineSyntaxes: [
+        _HighlightSyntax(),
+        _UnderlineSyntax(),
+        _SpanSyntax(),
+      ],
+      builders: {
+        'mark':    _HighlightBuilder(),
+        'u':       _UnderlineBuilder(),
+        'span':    _SpanBuilder(),
+        'callout': _CalloutBuilder(),
+      },
+      onTapLink: (text, href, title) {
+        if (href == null || href.isEmpty) return;
+        final uri = Uri.tryParse(href);
+        if (uri != null) {
+          launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
       },
     );
   }
 
-  static String _calloutIcon(String type) => switch (type) {
-        'note' || 'info'              => 'ℹ️',
-        'tip' || 'hint'               => '💡',
-        'warning'                     => '⚠️',
-        'danger' || 'error'           => '❗',
-        'success' || 'check'          => '✅',
-        'question'                    => '❓',
-        'quote'                       => '💬',
-        'todo'                        => '☐',
-        'bug'                         => '🐛',
-        'failure' || 'fail'           => '❌',
-        'example'                     => '📋',
-        'abstract' || 'summary'       => '📄',
-        _                             => '📝',
-      };
+  /// Strips `<div align="...">` wrappers (flutter_markdown can't align blocks).
+  static String _preprocessForPreview(String text) {
+    return text.replaceAllMapped(
+      RegExp(r'<div[^>]*>([\s\S]*?)</div>', caseSensitive: false),
+      (m) => m[1]!.trim(),
+    );
+  }
 }
 
 // ---------------------------------------------------------------------------
-// Custom markdown inline syntax: ==highlight==
+// Callout block syntax  ▸  renders > [!type][+-]? title  as a styled card
+// ---------------------------------------------------------------------------
+
+class _CalloutSyntax extends md.BlockSyntax {
+  const _CalloutSyntax();
+
+  static final _headerRe = RegExp(r'^> \[!(\w+)([+-]?)\][ \t]*(.*)$');
+
+  @override
+  RegExp get pattern => _headerRe;
+
+  @override
+  bool canParse(md.BlockParser parser) =>
+      _headerRe.hasMatch(parser.current.content);
+
+  @override
+  md.Node? parse(md.BlockParser parser) {
+    final m = _headerRe.firstMatch(parser.current.content);
+    if (m == null) return null;
+
+    final type  = m[1]!.toLowerCase();
+    final fold  = m[2]!;          // '+' expanded, '-' collapsed, '' not foldable
+    final title = m[3]!.trim();
+    parser.advance();
+
+    final buf = StringBuffer();
+    while (!parser.isDone) {
+      final line = parser.current.content;
+      if (line.startsWith('> ')) {
+        buf.writeln(line.substring(2));
+        parser.advance();
+      } else if (line == '>') {
+        buf.writeln();
+        parser.advance();
+      } else {
+        break;
+      }
+    }
+
+    final el = md.Element('callout', [md.Text(buf.toString().trimRight())]);
+    el.attributes['data-type']  = type;
+    el.attributes['data-fold']  = fold;
+    el.attributes['data-title'] = title.isNotEmpty ? title : type.toUpperCase();
+    return el;
+  }
+}
+
+class _CalloutBuilder extends MarkdownElementBuilder {
+  @override
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    final type    = element.attributes['data-type']  ?? 'note';
+    final fold    = element.attributes['data-fold']  ?? '';
+    final title   = element.attributes['data-title'] ?? type.toUpperCase();
+    final content = element.textContent;
+    final (color, icon) = _style(type);
+    return _CalloutCard(
+        title: title, content: content, fold: fold, color: color, icon: icon);
+  }
+
+  static (Color, IconData) _style(String t) => switch (t) {
+        'tip' || 'hint'          => (const Color(0xFF47B882), Icons.lightbulb_outline),
+        'success' || 'check'     => (const Color(0xFF47B882), Icons.check_circle_outline),
+        'warning'                => (const Color(0xFFF5A623), Icons.warning_amber_outlined),
+        'danger' || 'error'      => (const Color(0xFFE5534B), Icons.dangerous_outlined),
+        'failure' || 'fail'      => (const Color(0xFFE5534B), Icons.cancel_outlined),
+        'bug'                    => (const Color(0xFFE5534B), Icons.bug_report_outlined),
+        'question'               => (const Color(0xFF9B59B6), Icons.help_outline),
+        'quote'                  => (const Color(0xFF6B7280), Icons.format_quote_outlined),
+        'todo'                   => (const Color(0xFF4E9BF5), Icons.check_box_outlined),
+        'example'                => (const Color(0xFF9B59B6), Icons.list_alt_outlined),
+        'abstract' || 'summary'  => (const Color(0xFF47B882), Icons.subject_outlined),
+        _                        => (const Color(0xFF4E9BF5), Icons.info_outline),
+      };
+}
+
+class _CalloutCard extends StatefulWidget {
+  final String title, content, fold;
+  final Color color;
+  final IconData icon;
+
+  const _CalloutCard({
+    required this.title,
+    required this.content,
+    required this.fold,
+    required this.color,
+    required this.icon,
+  });
+
+  @override
+  State<_CalloutCard> createState() => _CalloutCardState();
+}
+
+class _CalloutCardState extends State<_CalloutCard> {
+  late bool _expanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _expanded = widget.fold != '-'; // '-' → collapsed; '+' or '' → expanded
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isFoldable = widget.fold.isNotEmpty;
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      decoration: BoxDecoration(
+        color: widget.color.withAlpha(25),
+        border: Border(left: BorderSide(color: widget.color, width: 4)),
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(4),
+          bottomRight: Radius.circular(4),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkWell(
+            onTap: isFoldable ? () => setState(() => _expanded = !_expanded) : null,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              child: Row(children: [
+                Icon(widget.icon, color: widget.color, size: 16),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    widget.title,
+                    style: TextStyle(
+                      color: widget.color,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                if (isFoldable)
+                  Icon(
+                    _expanded ? Icons.expand_less : Icons.expand_more,
+                    color: widget.color,
+                    size: 16,
+                  ),
+              ]),
+            ),
+          ),
+          if (_expanded && widget.content.trim().isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+              child: MarkdownBody(data: widget.content, shrinkWrap: true),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// ==highlight==
 // ---------------------------------------------------------------------------
 
 class _HighlightSyntax extends md.InlineSyntax {
@@ -288,12 +439,66 @@ class _HighlightBuilder extends MarkdownElementBuilder {
   @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     return Container(
-      color: const Color(0x55F5C518), // amber-ish highlight
+      color: const Color(0x55F5C518),
       padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: Text(
-        element.textContent,
-        style: preferredStyle,
-      ),
+      child: Text(element.textContent, style: preferredStyle),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// <u>underline</u>
+// ---------------------------------------------------------------------------
+
+class _UnderlineSyntax extends md.InlineSyntax {
+  _UnderlineSyntax() : super(r'<u>([\s\S]*?)</u>');
+
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    parser.addNode(md.Element.text('u', match[1]!));
+    return true;
+  }
+}
+
+class _UnderlineBuilder extends MarkdownElementBuilder {
+  @override
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    return Text(
+      element.textContent,
+      style: (preferredStyle ?? const TextStyle())
+          .copyWith(decoration: TextDecoration.underline),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// <span style="color:#hex">text</span>
+// ---------------------------------------------------------------------------
+
+class _SpanSyntax extends md.InlineSyntax {
+  _SpanSyntax() : super(r'<span\s+style="([^"]*)">([\s\S]*?)</span>');
+
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    final el = md.Element.text('span', match[2]!);
+    el.attributes['style'] = match[1]!;
+    parser.addNode(el);
+    return true;
+  }
+}
+
+class _SpanBuilder extends MarkdownElementBuilder {
+  @override
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    final style = element.attributes['style'] ?? '';
+    final hexMatch =
+        RegExp(r'color:\s*(#[0-9a-fA-F]{6})').firstMatch(style);
+    if (hexMatch == null) return null;
+    final color =
+        Color(int.parse(hexMatch[1]!.substring(1), radix: 16) | 0xFF000000);
+    return Text(
+      element.textContent,
+      style: (preferredStyle ?? const TextStyle()).copyWith(color: color),
     );
   }
 }
