@@ -673,6 +673,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Quick capture'**
   String get quickCaptureTooltip;
+
+  /// Button in quick capture dialog to open OCR scanner
+  ///
+  /// In en, this message translates to:
+  /// **'Scan URL from camera'**
+  String get quickCaptureScanUrl;
+
+  /// AppBar title for the OCR scanner screen
+  ///
+  /// In en, this message translates to:
+  /// **'Scan URL'**
+  String get ocrTitle;
+
+  /// Instruction shown on the OCR scanner screen
+  ///
+  /// In en, this message translates to:
+  /// **'Aim camera at the URL in the address bar, then tap Scan'**
+  String get ocrScanHint;
+
+  /// Button that triggers OCR capture
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get ocrScanButton;
+
+  /// Label while OCR is processing
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning…'**
+  String get ocrScanning;
+
+  /// Instruction to pick from detected URLs
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a URL to use it'**
+  String get ocrSelectUrl;
+
+  /// Shown when OCR finds no URLs
+  ///
+  /// In en, this message translates to:
+  /// **'No URLs detected — try again'**
+  String get ocrNoUrlsYet;
+
+  /// Error when no camera is found
+  ///
+  /// In en, this message translates to:
+  /// **'Camera not available on this device'**
+  String get ocrNoCameraError;
+
+  /// Label for the bookmark title field
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get bookmarkTitleLabel;
+
+  /// Shown while fetching the page title
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching title…'**
+  String get bookmarkTitleFetching;
+
+  /// Save button in bookmark mode
+  ///
+  /// In en, this message translates to:
+  /// **'Save Bookmark'**
+  String get bookmarkSave;
 }
 
 class _AppLocalizationsDelegate

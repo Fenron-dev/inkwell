@@ -61,6 +61,16 @@ dependencies:
   # Speech-to-Text (dictation in editor)
   speech_to_text: ^7.0.0
 
+  # OCR URL scanner
+  camera: ^0.11.0
+  google_mlkit_text_recognition: ^0.13.0
+
+  # Share intent (receive URLs from other apps)
+  receive_sharing_intent: ^1.8.1
+
+  # HTTP (page title fetching for bookmarks)
+  http: ^1.2.0
+
 dependency_overrides:
   # speech_to_text_windows 0.3.x fails to compile on Windows CI due to a
   # WinRT/coroutine naming mismatch. This local no-op stub provides the

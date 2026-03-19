@@ -225,5 +225,29 @@
   "quickCaptureSaved": "Appended to today's entry",
   "@quickCaptureSaved": { "description": "Snackbar after quick capture is saved" },
   "quickCaptureTooltip": "Quick capture",
-  "@quickCaptureTooltip": { "description": "Tooltip for the quick capture FAB" }
+  "@quickCaptureTooltip": { "description": "Tooltip for the quick capture FAB" },
+  "quickCaptureScanUrl": "Scan URL from camera",
+  "@quickCaptureScanUrl": { "description": "Button in quick capture dialog to open OCR scanner" },
+
+  "ocrTitle": "Scan URL",
+  "@ocrTitle": { "description": "AppBar title for the OCR scanner screen" },
+  "ocrScanHint": "Aim camera at the URL in the address bar, then tap Scan",
+  "@ocrScanHint": { "description": "Instruction shown on the OCR scanner screen" },
+  "ocrScanButton": "Scan",
+  "@ocrScanButton": { "description": "Button that triggers OCR capture" },
+  "ocrScanning": "Scanning…",
+  "@ocrScanning": { "description": "Label while OCR is processing" },
+  "ocrSelectUrl": "Tap a URL to use it",
+  "@ocrSelectUrl": { "description": "Instruction to pick from detected URLs" },
+  "ocrNoUrlsYet": "No URLs detected — try again",
+  "@ocrNoUrlsYet": { "description": "Shown when OCR finds no URLs" },
+  "ocrNoCameraError": "Camera not available on this device",
+  "@ocrNoCameraError": { "description": "Error when no camera is found" },
+
+  "bookmarkTitleLabel": "Title",
+  "@bookmarkTitleLabel": { "description": "Label for the bookmark title field" },
+  "bookmarkTitleFetching": "Fetching title…",
+  "@bookmarkTitleFetching": { "description": "Shown while fetching the page title" },
+  "bookmarkSave": "Save Bookmark",
+  "@bookmarkSave": { "description": "Save button in bookmark mode" }
 }

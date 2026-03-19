@@ -326,4 +326,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quickCaptureTooltip => 'Quick capture';
+
+  @override
+  String get quickCaptureScanUrl => 'Scan URL from camera';
+
+  @override
+  String get ocrTitle => 'Scan URL';
+
+  @override
+  String get ocrScanHint =>
+      'Aim camera at the URL in the address bar, then tap Scan';
+
+  @override
+  String get ocrScanButton => 'Scan';
+
+  @override
+  String get ocrScanning => 'Scanning…';
+
+  @override
+  String get ocrSelectUrl => 'Tap a URL to use it';
+
+  @override
+  String get ocrNoUrlsYet => 'No URLs detected — try again';
+
+  @override
+  String get ocrNoCameraError => 'Camera not available on this device';
+
+  @override
+  String get bookmarkTitleLabel => 'Title';
+
+  @override
+  String get bookmarkTitleFetching => 'Fetching title…';
+
+  @override
+  String get bookmarkSave => 'Save Bookmark';
 }
