@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide LockState;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inkwell/l10n/app_localizations.dart';
 
@@ -6,6 +6,10 @@ import '../../core/security/lock_provider.dart';
 import 'numpad.dart';
 
 /// Full-screen PIN entry shown when the app is locked.
+///
+/// If biometrics are enabled the fingerprint screen is shown first;
+/// the PIN pad is only revealed when biometrics fail or the user
+/// explicitly requests it ("Enter PIN" button).
 class LockScreen extends ConsumerStatefulWidget {
   const LockScreen({super.key});
 
@@ -19,20 +23,33 @@ class _LockScreenState extends ConsumerState<LockScreen> {
   String _pin = '';
   bool _error = false;
 
+  /// `true` while the biometric prompt should be shown instead of the numpad.
+  bool _biometricsPending = false;
+
   @override
   void initState() {
     super.initState();
-    // Auto-trigger biometrics as soon as the screen is displayed.
-    WidgetsBinding.instance.addPostFrameCallback((_) => _tryBiometrics());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final lock = ref.read(lockProvider);
+      if (lock.biometricsEnabled) {
+        setState(() => _biometricsPending = true);
+        _tryBiometrics();
+      }
+    });
   }
 
   Future<void> _tryBiometrics() async {
     if (!mounted) return;
-    final lock = ref.read(lockProvider);
-    if (!lock.biometricsEnabled) return;
+    setState(() => _biometricsPending = true);
     final l10n = AppLocalizations.of(context)!;
-    await ref.read(lockProvider.notifier).tryBiometrics(l10n.lockBiometricReason);
-    // GoRouter redirect fires automatically on state change.
+    final success = await ref
+        .read(lockProvider.notifier)
+        .tryBiometrics(l10n.lockBiometricReason);
+    // On success GoRouter redirect fires automatically.
+    // On failure / cancel → fall back to PIN pad.
+    if (!success && mounted) {
+      setState(() => _biometricsPending = false);
+    }
   }
 
   void _onDigit(String digit) {
@@ -59,18 +76,84 @@ class _LockScreenState extends ConsumerState<LockScreen> {
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // Build
+  // ---------------------------------------------------------------------------
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final lock = ref.watch(lockProvider);
     final scheme = Theme.of(context).colorScheme;
 
+    if (_biometricsPending) {
+      return _buildBiometricScreen(context, l10n, scheme);
+    }
+    return _buildPinScreen(context, l10n, lock, scheme);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Biometric waiting screen
+  // ---------------------------------------------------------------------------
+
+  Widget _buildBiometricScreen(
+    BuildContext context,
+    AppLocalizations l10n,
+    ColorScheme scheme,
+  ) {
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
             const Spacer(),
-            // Icon + title
+            Icon(Icons.lock_outline, size: 52, color: scheme.primary),
+            const SizedBox(height: 16),
+            Text(
+              l10n.lockBiometricReason,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 48),
+            IconButton(
+              iconSize: 80,
+              icon: Icon(Icons.fingerprint, color: scheme.primary),
+              tooltip: l10n.lockBiometricReason,
+              onPressed: _tryBiometrics,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              l10n.lockBiometricHint,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: scheme.outline),
+            ),
+            const Spacer(),
+            TextButton(
+              onPressed: () => setState(() => _biometricsPending = false),
+              child: Text(l10n.lockEnterPIN),
+            ),
+            const SizedBox(height: 40),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // PIN pad screen
+  // ---------------------------------------------------------------------------
+
+  Widget _buildPinScreen(
+    BuildContext context,
+    AppLocalizations l10n,
+    LockState lock,
+    ColorScheme scheme,
+  ) {
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            const Spacer(),
             Icon(Icons.lock_outline, size: 52, color: scheme.primary),
             const SizedBox(height: 16),
             Text(l10n.lockEnterPIN,
@@ -142,7 +225,8 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                               onTap: _tryBiometrics,
                             )
                           : const SizedBox(width: 72, height: 72),
-                      NumpadDigitKey(digit: '0', onTap: () => _onDigit('0')),
+                      NumpadDigitKey(
+                          digit: '0', onTap: () => _onDigit('0')),
                       NumpadIconKey(
                         icon: Icons.backspace_outlined,
                         onTap: _onBackspace,
@@ -160,4 +244,3 @@ class _LockScreenState extends ConsumerState<LockScreen> {
     );
   }
 }
-

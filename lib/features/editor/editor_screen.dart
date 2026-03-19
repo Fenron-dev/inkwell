@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:markdown/markdown.dart' as md;
 import 'package:inkwell/l10n/app_localizations.dart';
 
 import '../../core/search/search_provider.dart';
@@ -226,9 +227,73 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
 
   Widget _buildPreview() {
     return Markdown(
-      data: _controller.text,
+      data: _preprocessForPreview(_controller.text),
       selectable: true,
       padding: const EdgeInsets.all(16),
+      extensionSet: md.ExtensionSet.gitHubFlavored,
+      inlineSyntaxes: [_HighlightSyntax()],
+      builders: {'mark': _HighlightBuilder()},
+    );
+  }
+
+  /// Pre-processes raw markdown before rendering:
+  /// - Converts Obsidian callouts `> [!type]` to styled blockquotes with emoji.
+  static String _preprocessForPreview(String text) {
+    return text.replaceAllMapped(
+      RegExp(r'^> \[!(\w+)\][ \t]*([^\n]*)', multiLine: true),
+      (m) {
+        final type = m[1]!;
+        final title = m[2]!.trim();
+        final icon = _calloutIcon(type.toLowerCase());
+        final label = title.isNotEmpty
+            ? '$icon **${type.toUpperCase()}: $title**'
+            : '$icon **${type.toUpperCase()}**';
+        return '> $label';
+      },
+    );
+  }
+
+  static String _calloutIcon(String type) => switch (type) {
+        'note' || 'info'              => 'ℹ️',
+        'tip' || 'hint'               => '💡',
+        'warning'                     => '⚠️',
+        'danger' || 'error'           => '❗',
+        'success' || 'check'          => '✅',
+        'question'                    => '❓',
+        'quote'                       => '💬',
+        'todo'                        => '☐',
+        'bug'                         => '🐛',
+        'failure' || 'fail'           => '❌',
+        'example'                     => '📋',
+        'abstract' || 'summary'       => '📄',
+        _                             => '📝',
+      };
+}
+
+// ---------------------------------------------------------------------------
+// Custom markdown inline syntax: ==highlight==
+// ---------------------------------------------------------------------------
+
+class _HighlightSyntax extends md.InlineSyntax {
+  _HighlightSyntax() : super(r'==([^=\n]+)==');
+
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    parser.addNode(md.Element.text('mark', match[1]!));
+    return true;
+  }
+}
+
+class _HighlightBuilder extends MarkdownElementBuilder {
+  @override
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    return Container(
+      color: const Color(0x55F5C518), // amber-ish highlight
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      child: Text(
+        element.textContent,
+        style: preferredStyle,
+      ),
     );
   }
 }

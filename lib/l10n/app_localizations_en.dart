@@ -174,6 +174,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lockBiometricReason => 'Unlock Inkwell';
 
   @override
+  String get lockBiometricHint => 'Touch the sensor to unlock';
+
+  @override
   String get lockWrongPIN => 'Wrong PIN';
 
   @override

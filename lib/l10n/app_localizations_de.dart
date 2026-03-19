@@ -175,6 +175,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get lockBiometricReason => 'Inkwell entsperren';
 
   @override
+  String get lockBiometricHint => 'Sensor berühren zum Entsperren';
+
+  @override
   String get lockWrongPIN => 'Falscher PIN';
 
   @override

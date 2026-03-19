@@ -8,7 +8,12 @@ import 'package:flutter/material.dart';
 ///
 /// All operations act on [controller] and restore focus to [focusNode]
 /// after each edit so the cursor stays in the editor.
-class MarkdownToolbar extends StatelessWidget {
+///
+/// The widget is stateful so it can track the last valid selection —
+/// on Android, the TextField loses its selection when the user taps a
+/// toolbar button (focus moves away). Without the saved selection, every
+/// operation would silently do nothing because `_sel.isValid` returns false.
+class MarkdownToolbar extends StatefulWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
 
@@ -19,8 +24,44 @@ class MarkdownToolbar extends StatelessWidget {
   });
 
   @override
+  State<MarkdownToolbar> createState() => _MarkdownToolbarState();
+}
+
+class _MarkdownToolbarState extends State<MarkdownToolbar> {
+  /// The last valid selection seen while the TextField had focus.
+  TextSelection _savedSel = const TextSelection.collapsed(offset: 0);
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onControllerChanged);
+  }
+
+  @override
+  void didUpdateWidget(MarkdownToolbar old) {
+    super.didUpdateWidget(old);
+    if (old.controller != widget.controller) {
+      old.controller.removeListener(_onControllerChanged);
+      widget.controller.addListener(_onControllerChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onControllerChanged);
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    final sel = widget.controller.selection;
+    if (sel.isValid && sel.start >= 0) {
+      _savedSel = sel;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final h = _MdHelper(controller, focusNode);
+    final h = _MdHelper(widget.controller, widget.focusNode, _savedSel);
     final scheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -95,10 +136,24 @@ class _MdHelper {
   final TextEditingController _ctrl;
   final FocusNode _focus;
 
-  _MdHelper(this._ctrl, this._focus);
+  /// Fallback selection used when the controller's selection is invalid.
+  /// On Android, tapping a toolbar button removes focus from the TextField,
+  /// which resets the selection to offset -1 (invalid). The saved selection
+  /// lets us still act on the text the user had highlighted.
+  final TextSelection _savedSel;
+
+  _MdHelper(this._ctrl, this._focus, this._savedSel);
 
   String get _text => _ctrl.text;
-  TextSelection get _sel => _ctrl.selection;
+
+  /// Returns the current controller selection, falling back to [_savedSel]
+  /// when the controller's selection is invalid (e.g. after focus loss on Android).
+  TextSelection get _sel {
+    final s = _ctrl.selection;
+    if (s.isValid && s.start >= 0) return s;
+    return _savedSel;
+  }
+
   bool get _hasSel => _sel.isValid && !_sel.isCollapsed;
   String get _selected =>
       _hasSel ? _text.substring(_sel.start, _sel.end) : '';
