@@ -37,19 +37,23 @@ class SearchIndex {
     await for (final yearEntry in journalDir.list()) {
       if (yearEntry is! Directory) continue;
 
-      await for (final fileEntry in yearEntry.list()) {
-        if (fileEntry is! File || !fileEntry.path.endsWith('.md')) continue;
+      await for (final monthEntry in yearEntry.list()) {
+        if (monthEntry is! Directory) continue;
 
-        final filePath = fileEntry.path;
-        final stat = await fileEntry.stat();
-        final mtime = stat.modified.millisecondsSinceEpoch;
-        seen.add(filePath);
+        await for (final fileEntry in monthEntry.list()) {
+          if (fileEntry is! File || !fileEntry.path.endsWith('.md')) continue;
 
-        // Skip files that are already indexed at the same mtime.
-        if (indexed[filePath] == mtime) continue;
+          final filePath = fileEntry.path;
+          final stat = await fileEntry.stat();
+          final mtime = stat.modified.millisecondsSinceEpoch;
+          seen.add(filePath);
 
-        await _indexFile(fileEntry, filePath, mtime);
-        count++;
+          // Skip files that are already indexed at the same mtime.
+          if (indexed[filePath] == mtime) continue;
+
+          await _indexFile(fileEntry, filePath, mtime);
+          count++;
+        }
       }
     }
 

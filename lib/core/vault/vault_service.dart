@@ -81,11 +81,16 @@ tags: []
     return null;
   }
 
+  static final _monthFolderFormat = DateFormat('MM - MMMM', 'en_US');
+
   /// Returns the file path for a given date's entry.
+  ///
+  /// Structure: `journal/YYYY/MM - Month/YYYY-MM-DD.md`
   String entryPath(VaultConfig vault, DateTime date) {
     final year = date.year.toString();
+    final month = _monthFolderFormat.format(date);
     final fileName = '${_dateFormat.format(date)}.md';
-    return p.join(vault.journalPath, year, fileName);
+    return p.join(vault.journalPath, year, month, fileName);
   }
 
   /// Reads a journal entry for a specific date. Returns null if no entry exists.
@@ -158,12 +163,16 @@ tags: []
     await for (final yearDir in journalDir.list()) {
       if (yearDir is! Directory) continue;
 
-      await for (final file in yearDir.list()) {
-        if (file is! File || !file.path.endsWith('.md')) continue;
+      await for (final monthDir in yearDir.list()) {
+        if (monthDir is! Directory) continue;
 
-        final fileName = p.basenameWithoutExtension(file.path);
-        final date = DateTime.tryParse(fileName);
-        if (date != null) dates.add(date);
+        await for (final file in monthDir.list()) {
+          if (file is! File || !file.path.endsWith('.md')) continue;
+
+          final fileName = p.basenameWithoutExtension(file.path);
+          final date = DateTime.tryParse(fileName);
+          if (date != null) dates.add(date);
+        }
       }
     }
 
