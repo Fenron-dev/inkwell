@@ -1,0 +1,19 @@
+name: speech_to_text_windows
+description: "No-op Windows stub — speech recognition returns 'unavailable'."
+version: 0.3.1
+publish_to: 'none'
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    implements: speech_to_text
+    platforms:
+      windows:
+        pluginClass: SpeechToTextWindows

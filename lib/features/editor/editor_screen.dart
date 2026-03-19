@@ -116,10 +116,14 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   }
 
   Future<void> _initStt() async {
-    final available = await _stt.initialize(onError: (_) {
-      if (mounted) setState(() => _sttListening = false);
-    });
-    if (mounted) setState(() => _sttAvailable = available);
+    try {
+      final available = await _stt.initialize(onError: (_) {
+        if (mounted) setState(() => _sttListening = false);
+      });
+      if (mounted) setState(() => _sttAvailable = available);
+    } catch (_) {
+      // STT unavailable on this platform (e.g. Windows stub or missing perms)
+    }
   }
 
   Future<void> _toggleStt() async {
