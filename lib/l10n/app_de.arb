@@ -74,6 +74,10 @@
   "settingsLockBiometrics": "Biometrie nutzen",
   "settingsLockBiometricsHint": "Fingerabdruck / Face ID",
 
+  "settingsVaultPickTitle": "Vault-Ordner wählen",
+  "settingsVaultChange": "Vault wechseln",
+  "settingsVaultChangeFailed": "Ordner konnte nicht als Vault geöffnet werden.",
+
   "deleteEntryTitle": "Eintrag löschen?",
   "deleteEntryHint": "Diese Aktion kann nicht rückgängig gemacht werden.",
   "deleteEntryTooltip": "Eintrag löschen",

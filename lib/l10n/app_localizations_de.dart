@@ -223,6 +223,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsLockBiometricsHint => 'Fingerabdruck / Face ID';
 
   @override
+  String get settingsVaultPickTitle => 'Vault-Ordner wählen';
+
+  @override
+  String get settingsVaultChange => 'Vault wechseln';
+
+  @override
+  String get settingsVaultChangeFailed =>
+      'Ordner konnte nicht als Vault geöffnet werden.';
+
+  @override
   String get deleteEntryTitle => 'Eintrag löschen?';
 
   @override

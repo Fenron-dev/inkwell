@@ -151,6 +151,13 @@
   "settingsLockBiometricsHint": "Fingerprint / Face ID",
   "@settingsLockBiometricsHint": { "description": "Subtitle for biometrics toggle" },
 
+  "settingsVaultPickTitle": "Choose vault folder",
+  "@settingsVaultPickTitle": { "description": "Title for the folder picker dialog when changing the vault" },
+  "settingsVaultChange": "Change vault",
+  "@settingsVaultChange": { "description": "Button label to change the vault folder" },
+  "settingsVaultChangeFailed": "Could not open this folder as a vault.",
+  "@settingsVaultChangeFailed": { "description": "Error snackbar when vault change fails" },
+
   "deleteEntryTitle": "Delete entry?",
   "@deleteEntryTitle": { "description": "Confirmation dialog title for deleting an entry" },
   "deleteEntryHint": "This cannot be undone.",

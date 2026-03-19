@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:inkwell/l10n/app_localizations.dart';
 
+import 'package:file_picker/file_picker.dart';
+
 import '../../core/export/export_service.dart';
 import '../../core/security/lock_provider.dart';
 import '../../core/settings/settings_provider.dart';
+import '../../core/vault/vault_path_helper.dart';
 import '../../core/vault/vault_provider.dart';
 import '../../theme/app_theme.dart';
 import '../lock/pin_setup_screen.dart';
@@ -19,6 +22,28 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _exporting = false;
+  bool _changingVault = false;
+
+  Future<void> _changeVault(AppLocalizations l10n) async {
+    if (!VaultPathHelper.canPickDirectory) return;
+    final picked = await FilePicker.platform.getDirectoryPath(
+      dialogTitle: l10n.settingsVaultPickTitle,
+    );
+    if (picked == null || !mounted) return;
+
+    setState(() => _changingVault = true);
+    try {
+      final config = await ref.read(vaultProvider.notifier).openVault(picked);
+      if (!mounted) return;
+      if (config == null) {
+        _showSnackbar(l10n.settingsVaultChangeFailed);
+      }
+    } catch (e) {
+      if (mounted) _showSnackbar(l10n.settingsVaultChangeFailed);
+    } finally {
+      if (mounted) setState(() => _changingVault = false);
+    }
+  }
 
   Future<void> _runExport(AppLocalizations l10n) async {
     final vault = ref.read(vaultProvider).valueOrNull;
@@ -62,6 +87,32 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       body: settings.when(
         data: (s) => ListView(
           children: [
+            // Vault path
+            if (vault != null)
+              ListTile(
+                leading: _changingVault
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.folder_outlined),
+                title: Text(l10n.settingsVaultPath),
+                subtitle: Text(
+                  vault.path,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                trailing: VaultPathHelper.canPickDirectory && !_changingVault
+                    ? TextButton(
+                        onPressed: () => _changeVault(l10n),
+                        child: Text(l10n.settingsVaultChange),
+                      )
+                    : null,
+              ),
+            const Divider(),
+
             // Theme
             ListTile(
               leading: const Icon(Icons.palette_outlined),

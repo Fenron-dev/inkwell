@@ -428,6 +428,15 @@ abstract class AppLocalizations {
   /// Subtitle for biometrics toggle
   String get settingsLockBiometricsHint;
 
+  /// Title for the folder picker dialog when changing the vault
+  String get settingsVaultPickTitle;
+
+  /// Button label to change the vault folder
+  String get settingsVaultChange;
+
+  /// Error snackbar when vault change fails
+  String get settingsVaultChangeFailed;
+
   /// Confirmation dialog title for deleting an entry
   String get deleteEntryTitle;
 
