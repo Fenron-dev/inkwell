@@ -176,6 +176,8 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           MarkdownToolbar(controller: _controller, focusNode: _focusNode),
         // Editor / Preview area
         Expanded(child: _buildEditorArea(context)),
+        // Word / char count footer
+        _WordCountBar(controller: _controller),
       ],
     );
   }
@@ -230,6 +232,78 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// Word / character count footer
+// ---------------------------------------------------------------------------
+
+class _WordCountBar extends StatefulWidget {
+  final TextEditingController controller;
+  const _WordCountBar({required this.controller});
+
+  @override
+  State<_WordCountBar> createState() => _WordCountBarState();
+}
+
+class _WordCountBarState extends State<_WordCountBar> {
+  int _words = 0;
+  int _chars = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_update);
+    _update();
+  }
+
+  @override
+  void didUpdateWidget(_WordCountBar old) {
+    super.didUpdateWidget(old);
+    if (old.controller != widget.controller) {
+      old.controller.removeListener(_update);
+      widget.controller.addListener(_update);
+      _update();
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
+  }
+
+  void _update() {
+    final text = widget.controller.text;
+    final words = text.trim().isEmpty
+        ? 0
+        : text.trim().split(RegExp(r'\s+')).length;
+    final chars = text.length;
+    if (words != _words || chars != _chars) {
+      setState(() {
+        _words = words;
+        _chars = chars;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.labelSmall?.copyWith(
+          color: Theme.of(context).colorScheme.outline,
+        );
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Text('$_words words · $_chars chars', style: style),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 
 class _ModeButton extends StatelessWidget {
   final String label;
