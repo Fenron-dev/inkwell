@@ -186,7 +186,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lockSetupConfirm => 'Confirm PIN';
 
   @override
-  String get lockSetupNoMatch => "PINs don't match";
+  String get lockSetupNoMatch => 'PINs don\'t match';
 
   @override
   String get lockSetupDone => 'PIN saved';

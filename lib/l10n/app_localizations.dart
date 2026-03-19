@@ -375,75 +375,147 @@ abstract class AppLocalizations {
   String exportError(String error);
 
   /// Prompt on lock screen
+  ///
+  /// In en, this message translates to:
+  /// **'Enter PIN'**
   String get lockEnterPIN;
 
   /// Reason string shown by the OS biometric dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Inkwell'**
   String get lockBiometricReason;
 
   /// Error shown after wrong PIN entry
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong PIN'**
   String get lockWrongPIN;
 
   /// Title for PIN setup screen
+  ///
+  /// In en, this message translates to:
+  /// **'Set PIN'**
   String get lockSetupTitle;
 
   /// Prompt for entering a new PIN
+  ///
+  /// In en, this message translates to:
+  /// **'Enter new PIN'**
   String get lockSetupEnterNew;
 
   /// Prompt to re-enter the PIN for confirmation
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm PIN'**
   String get lockSetupConfirm;
 
   /// Error when the two PINs differ
+  ///
+  /// In en, this message translates to:
+  /// **'PINs don\'t match'**
   String get lockSetupNoMatch;
 
   /// Snackbar after PIN is saved
+  ///
+  /// In en, this message translates to:
+  /// **'PIN saved'**
   String get lockSetupDone;
 
   /// Button to change the PIN
+  ///
+  /// In en, this message translates to:
+  /// **'Change PIN'**
   String get lockChangePIN;
 
   /// Button to remove the PIN
+  ///
+  /// In en, this message translates to:
+  /// **'Remove PIN'**
   String get lockRemovePIN;
 
   /// Hint on remove-PIN step
+  ///
+  /// In en, this message translates to:
+  /// **'Enter current PIN to remove'**
   String get lockRemoveCurrentHint;
 
   /// Snackbar after PIN is removed
+  ///
+  /// In en, this message translates to:
+  /// **'PIN removed'**
   String get lockRemoveDone;
 
   /// Error when wrong PIN entered during remove
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong PIN — could not remove'**
   String get lockRemoveWrong;
 
   /// Settings section title for App Lock
+  ///
+  /// In en, this message translates to:
+  /// **'App Lock'**
   String get settingsLock;
 
   /// Tile to enable PIN lock
+  ///
+  /// In en, this message translates to:
+  /// **'Enable PIN lock'**
   String get settingsLockEnable;
 
   /// Status label when PIN is set
+  ///
+  /// In en, this message translates to:
+  /// **'PIN active'**
   String get settingsLockActive;
 
   /// Toggle for biometric unlock
+  ///
+  /// In en, this message translates to:
+  /// **'Use biometrics'**
   String get settingsLockBiometrics;
 
   /// Subtitle for biometrics toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Fingerprint / Face ID'**
   String get settingsLockBiometricsHint;
 
   /// Title for the folder picker dialog when changing the vault
+  ///
+  /// In en, this message translates to:
+  /// **'Choose vault folder'**
   String get settingsVaultPickTitle;
 
   /// Button label to change the vault folder
+  ///
+  /// In en, this message translates to:
+  /// **'Change vault'**
   String get settingsVaultChange;
 
   /// Error snackbar when vault change fails
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open this folder as a vault.'**
   String get settingsVaultChangeFailed;
 
   /// Confirmation dialog title for deleting an entry
+  ///
+  /// In en, this message translates to:
+  /// **'Delete entry?'**
   String get deleteEntryTitle;
 
   /// Warning text in delete confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'This cannot be undone.'**
   String get deleteEntryHint;
 
   /// Tooltip for the delete entry icon button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete entry'**
   String get deleteEntryTooltip;
 
   /// Generic cancel button
@@ -471,12 +543,21 @@ abstract class AppLocalizations {
   String get ok;
 
   /// AppBar title for the template editor screen
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Template'**
   String get templateEditorTitle;
 
   /// Hint text in the template editor
+  ///
+  /// In en, this message translates to:
+  /// **'Write your daily template here…'**
   String get templateEditorHint;
 
   /// Snackbar after the template is saved
+  ///
+  /// In en, this message translates to:
+  /// **'Template saved'**
   String get templateSaved;
 }
 
