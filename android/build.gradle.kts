@@ -20,14 +20,12 @@ subprojects {
 }
 
 // Force Java compile options to 17 for all plugin subprojects so they
-// match the Kotlin JVM target. The Kotlin task itself is already at 17
-// via KGP 2.x defaults; Java lags behind at 1.8 without this override.
+// match the Kotlin JVM target (KGP 2.x defaults to 17; Java stays at 1.8
+// unless overridden). Uses lazy configureEach — no afterEvaluate needed.
 subprojects {
-    afterEvaluate {
-        tasks.withType(JavaCompile::class.java).configureEach {
-            sourceCompatibility = "17"
-            targetCompatibility = "17"
-        }
+    tasks.withType(JavaCompile::class.java).configureEach {
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
     }
 }
 

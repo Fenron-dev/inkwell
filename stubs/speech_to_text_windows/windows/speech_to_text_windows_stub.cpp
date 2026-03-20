@@ -1,4 +1,4 @@
-#define FLUTTER_PLUGIN_IMPL
+// FLUTTER_PLUGIN_IMPL is defined via CMakeLists target_compile_definitions.
 #include "include/speech_to_text_windows/speech_to_text_windows_plugin.h"
 
 // No-op stub: speech recognition is not supported on Windows in this build.
