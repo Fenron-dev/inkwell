@@ -16,4 +16,4 @@ flutter:
     implements: speech_to_text
     platforms:
       windows:
-        pluginClass: SpeechToTextWindows
+        dartPluginClass: SpeechToTextWindowsStub
