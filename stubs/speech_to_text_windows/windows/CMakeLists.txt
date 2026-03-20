@@ -13,6 +13,4 @@ target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include"
 )
 
-target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
-
 set(speech_to_text_windows_bundled_libraries "" PARENT_SCOPE)

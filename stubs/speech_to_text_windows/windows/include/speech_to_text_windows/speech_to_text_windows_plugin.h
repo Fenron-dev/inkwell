@@ -1,7 +1,9 @@
 #ifndef FLUTTER_PLUGIN_SPEECH_TO_TEXT_WINDOWS_PLUGIN_H_
 #define FLUTTER_PLUGIN_SPEECH_TO_TEXT_WINDOWS_PLUGIN_H_
 
-#include <flutter/plugin_registrar_windows.h>
+// Forward-declare the Flutter registrar type so we don't need
+// flutter/plugin_registrar_windows.h in this stub header.
+typedef struct FlutterDesktopPluginRegistrar* FlutterDesktopPluginRegistrarRef;
 
 #ifdef FLUTTER_PLUGIN_IMPL
 #define FLUTTER_PLUGIN_EXPORT __declspec(dllexport)
