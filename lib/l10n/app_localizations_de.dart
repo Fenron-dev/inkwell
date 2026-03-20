@@ -169,6 +169,37 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get importZip => 'ZIP importieren';
+
+  @override
+  String get importRunning => 'Importiere…';
+
+  @override
+  String importDone(String path) {
+    return 'Importiert: $path';
+  }
+
+  @override
+  String get importCancelled => 'Import abgebrochen.';
+
+  @override
+  String importError(String error) {
+    return 'Import fehlgeschlagen: $error';
+  }
+
+  @override
+  String get settingsRecentVaults => 'Zuletzt geöffnet';
+
+  @override
+  String get settingsVaultSwitch => 'Wechseln';
+
+  @override
+  String get settingsVaultCreateNew => 'Neuen Vault erstellen';
+
+  @override
+  String get settingsVaultOpenOther => 'Anderen Ordner öffnen';
+
+  @override
   String get lockEnterPIN => 'PIN eingeben';
 
   @override

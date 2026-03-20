@@ -6,6 +6,7 @@ import 'package:inkwell/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/utils/url_utils.dart';
+import '../../core/vault/entry_refresh_provider.dart';
 import '../../core/vault/vault_provider.dart';
 import '../ocr_scanner/ocr_scanner_screen.dart';
 
@@ -112,6 +113,9 @@ class _QuickCaptureDialogState extends ConsumerState<QuickCaptureDialog> {
           ? '${entry.body.trimRight()}\n\n$text\n'
           : '${entry.body.trimRight()}\n\n**$timestamp** $text\n';
       await service.writeEntry(vault, entry.copyWith(body: appended));
+      // Signal the daily-notes editor to reload so the captured text is
+      // visible immediately without navigating away first.
+      ref.read(entryRefreshProvider.notifier).state++;
 
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;

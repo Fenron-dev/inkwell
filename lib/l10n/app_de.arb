@@ -55,6 +55,19 @@
   "exportCancelled": "Export abgebrochen.",
   "exportError": "Export fehlgeschlagen: {error}",
 
+  "importZip": "ZIP importieren",
+  "importRunning": "Importiere…",
+  "importDone": "Importiert: {path}",
+  "@importDone": { "placeholders": { "path": { "type": "String" } } },
+  "importCancelled": "Import abgebrochen.",
+  "importError": "Import fehlgeschlagen: {error}",
+  "@importError": { "placeholders": { "error": { "type": "String" } } },
+
+  "settingsRecentVaults": "Zuletzt geöffnet",
+  "settingsVaultSwitch": "Wechseln",
+  "settingsVaultCreateNew": "Neuen Vault erstellen",
+  "settingsVaultOpenOther": "Anderen Ordner öffnen",
+
   "lockEnterPIN": "PIN eingeben",
   "lockBiometricReason": "Inkwell entsperren",
   "lockBiometricHint": "Sensor berühren zum Entsperren",

@@ -10,27 +10,54 @@ import 'vault_service.dart';
 /// Provides the VaultService singleton.
 final vaultServiceProvider = Provider<VaultService>((ref) => VaultService());
 
-/// Persists and loads the last-used vault path.
+/// Persists and loads the last-used vault path and the recent-vaults list.
 class _VaultStorage {
+  static const _maxRecent = 5;
+
   static Future<File> get _file async {
     final dir = await getApplicationSupportDirectory();
     return File('${dir.path}/inkwell_vault.json');
   }
 
-  static Future<String?> loadLastVaultPath() async {
+  static Future<Map<String, dynamic>> _load() async {
     try {
       final file = await _file;
       if (await file.exists()) {
-        final json = jsonDecode(await file.readAsString());
-        return json['lastVaultPath'] as String?;
+        final decoded = jsonDecode(await file.readAsString());
+        if (decoded is Map<String, dynamic>) return decoded;
       }
     } catch (_) {}
-    return null;
+    return {};
+  }
+
+  static Future<void> _save(Map<String, dynamic> data) async {
+    final file = await _file;
+    await file.writeAsString(jsonEncode(data));
+  }
+
+  static Future<String?> loadLastVaultPath() async {
+    final data = await _load();
+    return data['lastVaultPath'] as String?;
+  }
+
+  static Future<List<String>> loadRecentVaults() async {
+    final data = await _load();
+    final raw = data['recentVaults'];
+    if (raw is List) return raw.cast<String>();
+    return [];
   }
 
   static Future<void> saveLastVaultPath(String path) async {
-    final file = await _file;
-    await file.writeAsString(jsonEncode({'lastVaultPath': path}));
+    final data = await _load();
+    final recent = List<String>.from(
+      (data['recentVaults'] as List? ?? []).cast<String>(),
+    )
+      ..remove(path)
+      ..insert(0, path);
+    if (recent.length > _maxRecent) recent.length = _maxRecent;
+    data['lastVaultPath'] = path;
+    data['recentVaults'] = recent;
+    await _save(data);
   }
 }
 
@@ -91,3 +118,8 @@ class VaultNotifier extends AsyncNotifier<VaultConfig?> {
 
 final vaultProvider =
     AsyncNotifierProvider<VaultNotifier, VaultConfig?>(VaultNotifier.new);
+
+/// Ordered list of recently opened vault paths (most recent first, max 5).
+final recentVaultsProvider = FutureProvider<List<String>>(
+  (_) => _VaultStorage.loadRecentVaults(),
+);

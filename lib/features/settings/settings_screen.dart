@@ -5,6 +5,7 @@ import 'package:inkwell/l10n/app_localizations.dart';
 import 'package:file_picker/file_picker.dart';
 
 import '../../core/export/export_service.dart';
+import '../../core/export/import_service.dart';
 import '../../core/security/lock_provider.dart';
 import '../../core/settings/settings_provider.dart';
 import '../../core/vault/vault_path_helper.dart';
@@ -23,6 +24,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _exporting = false;
+  bool _importing = false;
   bool _changingVault = false;
 
   Future<void> _changeVault(AppLocalizations l10n) async {
@@ -43,6 +45,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (mounted) _showSnackbar(l10n.settingsVaultChangeFailed);
     } finally {
       if (mounted) setState(() => _changingVault = false);
+    }
+  }
+
+  Future<void> _runImport(AppLocalizations l10n) async {
+    setState(() => _importing = true);
+    try {
+      final result = await ImportService().importZip();
+      if (!mounted) return;
+      if (result == null) {
+        _showSnackbar(l10n.importCancelled);
+      } else {
+        await ref.read(vaultProvider.notifier).openVault(result.vaultPath);
+        ref.invalidate(recentVaultsProvider);
+        if (mounted) _showSnackbar(l10n.importDone(result.vaultPath));
+      }
+    } catch (e) {
+      if (mounted) _showSnackbar(l10n.importError(e.toString()));
+    } finally {
+      if (mounted) setState(() => _importing = false);
     }
   }
 
@@ -82,6 +103,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final settings = ref.watch(settingsProvider);
     final vault = ref.watch(vaultProvider).valueOrNull;
+    final recentVaults = ref.watch(recentVaultsProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settingsTitle)),
@@ -112,6 +134,70 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       )
                     : null,
               ),
+
+            // Recent vaults
+            recentVaults.when(
+              data: (recents) {
+                // Filter out the currently open vault
+                final others = recents
+                    .where((p) => vault == null || p != vault.path)
+                    .toList();
+                if (others.isEmpty) return const SizedBox.shrink();
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+                      child: Text(
+                        l10n.settingsRecentVaults,
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
+                      ),
+                    ),
+                    ...others.map((path) => ListTile(
+                          dense: true,
+                          leading: const Icon(Icons.folder_open_outlined),
+                          title: Text(
+                            path,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          trailing: TextButton(
+                            onPressed: () async {
+                              setState(() => _changingVault = true);
+                              try {
+                                final config = await ref
+                                    .read(vaultProvider.notifier)
+                                    .openVault(path);
+                                if (mounted && config == null) {
+                                  _showSnackbar(
+                                      l10n.settingsVaultChangeFailed);
+                                }
+                              } catch (_) {
+                                if (mounted) {
+                                  _showSnackbar(
+                                      l10n.settingsVaultChangeFailed);
+                                }
+                              } finally {
+                                if (mounted) {
+                                  setState(() => _changingVault = false);
+                                }
+                              }
+                            },
+                            child: Text(l10n.settingsVaultSwitch),
+                          ),
+                        )),
+                  ],
+                );
+              },
+              loading: () => const SizedBox.shrink(),
+              error: (_, _) => const SizedBox.shrink(),
+            ),
+
             const Divider(),
 
             // Theme
@@ -219,14 +305,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.archive_outlined),
-                title: Text(_exporting
-                    ? l10n.exportRunning
-                    : l10n.exportZip),
-                trailing: _exporting
-                    ? null
-                    : const Icon(Icons.chevron_right),
+                title: Text(_exporting ? l10n.exportRunning : l10n.exportZip),
+                trailing: _exporting ? null : const Icon(Icons.chevron_right),
                 onTap: _exporting ? null : () => _runExport(l10n),
               ),
+
+            // Import
+            ListTile(
+              leading: _importing
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.unarchive_outlined),
+              title: Text(_importing ? l10n.importRunning : l10n.importZip),
+              trailing: _importing ? null : const Icon(Icons.chevron_right),
+              onTap: _importing ? null : () => _runImport(l10n),
+            ),
           ],
         ),
         loading: () => const Center(child: CircularProgressIndicator()),

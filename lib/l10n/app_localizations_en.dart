@@ -168,6 +168,37 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get importZip => 'Import ZIP';
+
+  @override
+  String get importRunning => 'Importing…';
+
+  @override
+  String importDone(String path) {
+    return 'Imported: $path';
+  }
+
+  @override
+  String get importCancelled => 'Import cancelled.';
+
+  @override
+  String importError(String error) {
+    return 'Import failed: $error';
+  }
+
+  @override
+  String get settingsRecentVaults => 'Recently opened';
+
+  @override
+  String get settingsVaultSwitch => 'Switch';
+
+  @override
+  String get settingsVaultCreateNew => 'Create new vault';
+
+  @override
+  String get settingsVaultOpenOther => 'Open other folder';
+
+  @override
   String get lockEnterPIN => 'Enter PIN';
 
   @override

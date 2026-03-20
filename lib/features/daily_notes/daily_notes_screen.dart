@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:inkwell/l10n/app_localizations.dart';
 
 import '../../core/search/search_provider.dart';
+import '../../core/vault/entry_refresh_provider.dart';
 import '../../core/vault/vault_provider.dart';
 import '../../models/journal_entry.dart';
 import '../editor/editor_screen.dart';
@@ -182,8 +183,9 @@ class _DailyNotesScreenState extends ConsumerState<DailyNotesScreen> {
                     child: Text(l10n.vaultChooseLocation),
                   );
                 }
+                final refresh = ref.watch(entryRefreshProvider);
                 return EditorScreen(
-                  key: ValueKey(_selectedDate),
+                  key: ValueKey('$_selectedDate-$refresh'),
                   date: _selectedDate,
                 );
               },

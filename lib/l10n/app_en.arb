@@ -114,6 +114,19 @@
     "placeholders": { "error": { "type": "String" } }
   },
 
+  "importZip": "Import ZIP",
+  "importRunning": "Importing…",
+  "importDone": "Imported: {path}",
+  "@importDone": { "placeholders": { "path": { "type": "String" } } },
+  "importCancelled": "Import cancelled.",
+  "importError": "Import failed: {error}",
+  "@importError": { "placeholders": { "error": { "type": "String" } } },
+
+  "settingsRecentVaults": "Recently opened",
+  "settingsVaultSwitch": "Switch",
+  "settingsVaultCreateNew": "Create new vault",
+  "settingsVaultOpenOther": "Open other folder",
+
   "lockEnterPIN": "Enter PIN",
   "@lockEnterPIN": { "description": "Prompt on lock screen" },
   "lockBiometricReason": "Unlock Inkwell",

@@ -374,6 +374,60 @@ abstract class AppLocalizations {
   /// **'Export failed: {error}'**
   String exportError(String error);
 
+  /// No description provided for @importZip.
+  ///
+  /// In en, this message translates to:
+  /// **'Import ZIP'**
+  String get importZip;
+
+  /// No description provided for @importRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing…'**
+  String get importRunning;
+
+  /// No description provided for @importDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Imported: {path}'**
+  String importDone(String path);
+
+  /// No description provided for @importCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Import cancelled.'**
+  String get importCancelled;
+
+  /// No description provided for @importError.
+  ///
+  /// In en, this message translates to:
+  /// **'Import failed: {error}'**
+  String importError(String error);
+
+  /// No description provided for @settingsRecentVaults.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently opened'**
+  String get settingsRecentVaults;
+
+  /// No description provided for @settingsVaultSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch'**
+  String get settingsVaultSwitch;
+
+  /// No description provided for @settingsVaultCreateNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Create new vault'**
+  String get settingsVaultCreateNew;
+
+  /// No description provided for @settingsVaultOpenOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Open other folder'**
+  String get settingsVaultOpenOther;
+
   /// Prompt on lock screen
   ///
   /// In en, this message translates to:
