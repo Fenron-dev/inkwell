@@ -39,6 +39,9 @@ class _OcrScannerScreenState extends State<OcrScannerScreen> {
   bool _scanning = false;
   String? _initError;
   List<String> _urls = [];
+  String _rawText = '';
+  bool _showRaw = false;
+  final _manualCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -48,6 +51,7 @@ class _OcrScannerScreenState extends State<OcrScannerScreen> {
 
   @override
   void dispose() {
+    _manualCtrl.dispose();
     _recognizer.close();
     _cam?.dispose();
     super.dispose();
@@ -93,6 +97,8 @@ class _OcrScannerScreenState extends State<OcrScannerScreen> {
     setState(() {
       _scanning = true;
       _urls = [];
+      _rawText = '';
+      _showRaw = false;
     });
     try {
       final photo = await _cam!.takePicture();
@@ -103,7 +109,12 @@ class _OcrScannerScreenState extends State<OcrScannerScreen> {
       if (await file.exists()) file.delete().ignore();
 
       final found = extractUrls(result.text);
-      if (mounted) setState(() => _urls = found);
+      if (mounted) {
+        setState(() {
+          _urls = found;
+          _rawText = result.text.trim();
+        });
+      }
     } catch (_) {
       // Leave _urls empty — "try again" hint is shown
     } finally {
@@ -188,7 +199,7 @@ class _OcrScannerScreenState extends State<OcrScannerScreen> {
                     if (_urls.isNotEmpty) ...[
                       Text(
                         l10n.ocrSelectUrl,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 12,
                         ),
@@ -202,13 +213,106 @@ class _OcrScannerScreenState extends State<OcrScannerScreen> {
                       ),
                       const SizedBox(height: 8),
                     ] else if (!_scanning && !_initializing) ...[
-                      Text(
-                        l10n.ocrNoUrlsYet,
-                        style: const TextStyle(
-                            color: Colors.white54, fontSize: 12),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
+                      // No URLs found — offer raw text + manual input
+                      if (_rawText.isNotEmpty) ...[
+                        GestureDetector(
+                          onTap: () =>
+                              setState(() => _showRaw = !_showRaw),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  l10n.ocrNoUrlsYet,
+                                  style: const TextStyle(
+                                      color: Colors.white54, fontSize: 12),
+                                ),
+                              ),
+                              Icon(
+                                _showRaw
+                                    ? Icons.expand_less
+                                    : Icons.expand_more,
+                                color: Colors.white38,
+                                size: 18,
+                              ),
+                              Text(
+                                'OCR',
+                                style: const TextStyle(
+                                    color: Colors.white38, fontSize: 11),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (_showRaw) ...[
+                          const SizedBox(height: 8),
+                          Container(
+                            constraints:
+                                const BoxConstraints(maxHeight: 120),
+                            decoration: BoxDecoration(
+                              color: Colors.white10,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: SingleChildScrollView(
+                              padding: const EdgeInsets.all(8),
+                              child: SelectableText(
+                                _rawText,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 11,
+                                  fontFamily: 'monospace',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 8),
+                        // Manual URL entry
+                        TextField(
+                          controller: _manualCtrl,
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 13),
+                          decoration: InputDecoration(
+                            hintText: 'https://…',
+                            hintStyle: const TextStyle(
+                                color: Colors.white38),
+                            filled: true,
+                            fillColor: Colors.white10,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
+                            suffixIcon: IconButton(
+                              icon: const Icon(Icons.arrow_forward,
+                                  color: Colors.white70),
+                              onPressed: () {
+                                final url = _manualCtrl.text.trim();
+                                if (url.isNotEmpty) {
+                                  Navigator.of(context).pop(
+                                      looksLikeUrl(url) ? url : 'https://$url');
+                                }
+                              },
+                            ),
+                          ),
+                          onSubmitted: (url) {
+                            if (url.trim().isNotEmpty) {
+                              Navigator.of(context).pop(
+                                  looksLikeUrl(url.trim())
+                                      ? url.trim()
+                                      : 'https://${url.trim()}');
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 8),
+                      ] else ...[
+                        Text(
+                          l10n.ocrNoUrlsYet,
+                          style: const TextStyle(
+                              color: Colors.white54, fontSize: 12),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                      ],
                     ],
 
                     // Scan button
