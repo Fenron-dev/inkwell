@@ -19,16 +19,14 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
-// Force every plugin subproject's Java and Kotlin compile tasks to JVM 17
-// so third-party plugins (e.g. receive_sharing_intent) don't cause a mismatch.
+// Force Java compile options to 17 for all plugin subprojects so they
+// match the Kotlin JVM target. The Kotlin task itself is already at 17
+// via KGP 2.x defaults; Java lags behind at 1.8 without this override.
 subprojects {
     afterEvaluate {
-        tasks.withType<JavaCompile>().configureEach {
-            sourceCompatibility = JavaVersion.VERSION_17.toString()
-            targetCompatibility = JavaVersion.VERSION_17.toString()
-        }
-        tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-            kotlinOptions { jvmTarget = "17" }
+        tasks.withType(JavaCompile::class.java).configureEach {
+            sourceCompatibility = "17"
+            targetCompatibility = "17"
         }
     }
 }
