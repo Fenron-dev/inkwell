@@ -6,7 +6,7 @@
 /// The speech_to_text platform interface will fall back to its defaults
 /// (initialize → false) since this class does not register an implementation.
 class SpeechToTextWindowsStub {
-  static void registerWith(Object registrar) {
+  static void registerWith() {
     // Intentionally empty — SpeechToText.initialize() will return false.
   }
 }
